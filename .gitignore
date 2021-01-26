@@ -69,3 +69,4 @@ src/main/resources/application.yml
 ## 숨겨야하는 파일
 *secret/Secret.java
 */Secret*
+*Secret*
