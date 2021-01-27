@@ -10,8 +10,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class GetUsedTransactionsRes {
-    private final int postingNo;
-    private final int sellerUserNo;
+    private final Integer postingNo;
+    private final Integer sellerUserNo;
     private final String title;
     private final String content;
     private final String category;

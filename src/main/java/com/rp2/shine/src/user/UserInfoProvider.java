@@ -131,7 +131,7 @@ public class UserInfoProvider {
         }
 
         // SellPosting 개수 조회
-        int sellpostingCnt = usedTransactionsProvider.retrieveSellPostingInfoBySellerUserNo(userInfo).size();
+        int sellpostingCnt = usedTransactionsProvider.retrievePostingBySellerUserNoAndStatuY(userInfo).size();
 
         // review
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewALL(userNo);

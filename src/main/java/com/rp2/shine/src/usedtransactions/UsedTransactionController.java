@@ -17,12 +17,13 @@ public class UsedTransactionController {
     /**
      * 중고거래 글 등록 API
      * [POST] /usedtransactions/:userNo
-     * @PathVariable sellerUserNo
-     * @RequestBody PostUsedStoreReq
+     * @PathVariable userNo
+     * @RequestBody PostUsedTransactionsReq
      * @return BaseResponse<PostUsedTransactionsRes>
      */
+    @ResponseBody
     @PostMapping("/{userNo}")
-    public BaseResponse<PostUsedTransactionsRes> postUsedTransactions(@PathVariable Integer userNo, PostUsedTransactionsReq parameters) {
+    public BaseResponse<PostUsedTransactionsRes> postUsedTransactions(@PathVariable Integer userNo, @RequestBody(required = false) PostUsedTransactionsReq parameters) {
         if(userNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
@@ -41,7 +42,7 @@ public class UsedTransactionController {
 
         try {
             PostUsedTransactionsRes postUsedStoreRes = usedTransactionsService.createUsedTransactions(userNo, parameters);
-            return new BaseResponse<>(SUCCESS_POST_USEDSTORE, postUsedStoreRes);
+            return new BaseResponse<>(SUCCESS_POST_POSTING, postUsedStoreRes);
         } catch (BaseException exception) {
             //exception.printStackTrace();
             return new BaseResponse<>(exception.getStatus());
@@ -50,18 +51,18 @@ public class UsedTransactionController {
 
     /**
      * 회원 정보 수정 API
-     * [PATCH] /usedstore/:sellerUserNo/:sellPostingNo
-     * @PathVariable userNo
-     * @RequestBody PatchUserReq
-     * @return BaseResponse<PatchUserRes>
+     * [PATCH] /usedtransactions/:postingNo/:userNo
+     * @PathVariable postingNo, userNo
+     * @RequestBody PatchUsedTransactionReq
+     * @return BaseResponse<PatchUsedTransactionRes>
      */
-    @PatchMapping("/{sellerUserNo}/{sellPostingNo}")
-    public BaseResponse<PatchUsedTransactionRes> patchUsedStrore(@PathVariable Integer sellerUserNo, @PathVariable Integer sellPostingNo, PatchUsedTransactionReq parameters) {
-
-        if (sellerUserNo == null) {
+    @ResponseBody
+    @PatchMapping("/{postingNo}/{userNo}")
+    public BaseResponse<PatchUsedTransactionRes> patchUsedTransaction(@PathVariable Integer postingNo, @PathVariable Integer userNo, @RequestBody(required = false) PatchUsedTransactionReq parameters) {
+        if (postingNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
-        if (sellPostingNo == null) {
+        if (userNo == null) {
             return new BaseResponse<>(EMPTY_SELLERUSERNO);
         }
         if (parameters.getTitle() == null || parameters.getTitle().length() == 0) {
@@ -78,8 +79,8 @@ public class UsedTransactionController {
         }
 
         try {
-            PatchUsedTransactionRes patchUsedStoreRes = usedTransactionsService.updateUsedStoreInfo(sellerUserNo, sellPostingNo, parameters);
-            return new BaseResponse<>(SUCCESS_PATCH_USEDSTORE, patchUsedStoreRes);
+            PatchUsedTransactionRes patchUsedStoreRes = usedTransactionsService.updateUsedTransaction(postingNo, userNo, parameters);
+            return new BaseResponse<>(SUCCESS_PATCH_POSTING, patchUsedStoreRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -87,22 +88,23 @@ public class UsedTransactionController {
 
     /**
      * 중고거래 글 삭제 API
-     * [DELETE] /usedstore/:sellerUserNo/:sellPostingNo
-     * @PathVariable sellerUserNo, sellPostingNo
+     * [DELETE] /usedtransactions/:postingNo/:userNo
+     * @PathVariable postingNo, userNo
      * @return BaseResponse<Void>
      */
-    @DeleteMapping("/{sellerUserNo}/{sellPostingNo}")
-    public BaseResponse<Void> deleteUsedStore(@PathVariable Integer sellerUserNo, @PathVariable Integer sellPostingNo) {
-        if (sellPostingNo == null || sellPostingNo <= 0) {
+    @ResponseBody
+    @DeleteMapping("/{postingNo}/{userNo}")
+    public BaseResponse<Void> deleteUsedTransaction(@PathVariable Integer postingNo, @PathVariable Integer userNo) {
+        if (postingNo == null) {
             return new BaseResponse<>(EMPTY_SELLERUSERNO);
         }
-        if (sellerUserNo == null || sellerUserNo <= 0) {
+        if (userNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
 
         try {
-            usedTransactionsService.deleteUsedStore(sellPostingNo);
-            return new BaseResponse<>(SUCCESS_DELETE_USEDSTORE);
+            usedTransactionsService.deleteUsedTransaction(postingNo, userNo);
+            return new BaseResponse<>(SUCCESS_DELETE_POSTING);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -110,21 +112,19 @@ public class UsedTransactionController {
 
     /**
      * 중고거래 글 관심 등록 API
-     * [POST] /usedstore/concerns/:postringNo/:userNo
-     * @PathVariable postringNo, userNo
+     * [POST] /usedtransactions/concerns/:postingNo/:userNo
+     * @PathVariable postingNo, userNo
      * @return BaseResponse<PostConcernRes>
      */
     @PostMapping("/concerns/{postingNo}/{userNo}")
     public BaseResponse<PostConcernRes> postConcern(@PathVariable Integer postingNo, @PathVariable Integer userNo) {
-        // 1. Body Parameter Validation
         if(postingNo == null) {
-            return new BaseResponse<>(EMPTY_POSTNO);
+            return new BaseResponse<>(EMPTY_POSTINGNO);
         }
         if(userNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
 
-        // 2. Post UserInfo
         try {
             PostConcernRes postConcernRes = usedTransactionsService.createConcern(postingNo, userNo);
             return new BaseResponse<>(SUCCESS_POST_CONCERN, postConcernRes);
@@ -136,7 +136,7 @@ public class UsedTransactionController {
 
     /**
      * 중고거래 관심 삭제 API
-     * [DELETE] /usedstore/concerns/:postringNo/:userNo
+     * [DELETE] /usedtransactions/concerns/:postringNo/:userNo
      * @PathVariable postringNo, userNo
      * @return BaseResponse<Void>
      */
@@ -144,7 +144,7 @@ public class UsedTransactionController {
     public BaseResponse<Void> deleteConcern(@PathVariable Integer postingNo, @PathVariable Integer userNo) {
         // 1. Body Parameter Validation
         if(postingNo == null) {
-            return new BaseResponse<>(EMPTY_POSTNO);
+            return new BaseResponse<>(EMPTY_POSTINGNO);
         }
         if(userNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);

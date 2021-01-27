@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "SellPostingConcern")
-public class SellPostingConsernInfo {
+public class SellPostingConcernInfo {
     @Id
     @Column(name = "concernNo", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class SellPostingConsernInfo {
     @Column(name = "status", nullable = false, length = 1)
     private String status = "Y";
 
-    public SellPostingConsernInfo(UserInfo concernUserNo, SellPostingInfo postingNo) {
+    public SellPostingConcernInfo(UserInfo concernUserNo, SellPostingInfo postingNo) {
         this.concernUserNo = concernUserNo;
         this.postingNo = postingNo;
     }

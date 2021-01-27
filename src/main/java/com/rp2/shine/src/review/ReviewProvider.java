@@ -2,6 +2,7 @@ package com.rp2.shine.src.review;
 
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.review.models.ReviewInfo;
+import com.rp2.shine.src.usedtransactions.models.SellPostingInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,26 @@ public class ReviewProvider {
 
         try {
             reviewInfoList = reviewRepository.findByWriterAndStatusOrderByCreateDateDesc(userNo, "Y");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_REVIEW);
+        }
+
+        return reviewInfoList;
+    }
+
+    /**
+     * 중고거래별 후기 조회
+     * @param sellPostingInfo
+     * @return List<ReviewInfo>
+     * @throws BaseException
+     * @comment SellPostingInfo로 후기 조회
+     */
+    @Transactional
+    public List<ReviewInfo> retrieveReviewByPostingNo(SellPostingInfo sellPostingInfo) throws BaseException {
+        List<ReviewInfo> reviewInfoList;
+
+        try {
+            reviewInfoList = reviewRepository.findBySellPostingInfo(sellPostingInfo);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_REVIEW);
         }

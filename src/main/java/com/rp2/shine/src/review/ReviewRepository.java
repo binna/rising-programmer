@@ -11,4 +11,5 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<ReviewInfo, Integer> {
     List<ReviewInfo> findBySellPostingInfoAndWriterAndDivisionAndStatus(SellPostingInfo sellPostingInfo, Integer writer, String division, String status);
     List<ReviewInfo> findByWriterAndStatusOrderByCreateDateDesc(Integer writer, String status);
+    List<ReviewInfo> findBySellPostingInfo(SellPostingInfo sellPostingInfo);
 }
