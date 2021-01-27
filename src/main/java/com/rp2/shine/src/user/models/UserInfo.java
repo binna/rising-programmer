@@ -19,50 +19,30 @@ import javax.persistence.*;
 @Data                   // from lombok
 @Entity                 // 필수, Class 를 Database Table화 해주는 것이다
 @Table(name = "User")   // Table 이름을 명시해주지 않으면 class 이름을 Table 이름으로 대체한다.
-public class UsersInfo extends BaseEntity {
-
-    /**
-     * 회원번호
-     */
+public class UserInfo extends BaseEntity {
     @Id                 // PK를 의미하는 어노테이션
     @Column(name = "userNo", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)     // 기본키 생성을 데이터베이스에 위임 즉, id 값을 null로 하면 DB가 알아서 AUTO_INCREMENT 해준다.
     private Integer userNo;
 
-    /**
-     * 별명
-     */
     @Column(name = "nickname", nullable = false, length = 10)
     private String nickname;
 
-    /**
-     * 휴대폰 번호
-     */
     @Column(name = "phoneNumber", nullable = false, length = 15)
     private String phoneNumber;
 
-    /**
-     * 프로필 사진
-     */
     @Column(name = "profilePath", length = 100)
     private String profilePath;
     @Column(name = "profileName", length = 100)
     private String profileName;
 
-
-    /**
-     * 탈퇴사유
-     */
     @Column(name = "withdrawalReason", length = 1)
     private String withdrawalReason;
 
-    /**
-     * 이메일
-     */
     @Column(name = "email", length = 50)
     private String email;
 
-    public UsersInfo(String nickname, String phoneNumber, String profilePath, String profileName) {
+    public UserInfo(String nickname, String phoneNumber, String profilePath, String profileName) {
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.profilePath = profilePath;

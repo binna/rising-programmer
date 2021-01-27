@@ -12,5 +12,4 @@ public class PatchUserRes {
     private final String profilePath;
     private final String email;
     private final String phoneNumber;
-
 }

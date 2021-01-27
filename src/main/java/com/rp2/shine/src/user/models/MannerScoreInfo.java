@@ -1,6 +1,5 @@
 package com.rp2.shine.src.user.models;
 
-import com.rp2.shine.src.user.models.UsersInfo;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,12 +20,12 @@ public class MannerScoreInfo {
 
     @OneToOne
     @JoinColumn(name = "userNo", referencedColumnName = "userNo")
-    private UsersInfo userNo;
+    private UserInfo userNo;
 
     @Column(name = "takeManner", nullable = false)
     private Integer takeManner;
 
-    public MannerScoreInfo(UsersInfo usersInfo, Integer takeManner) {
+    public MannerScoreInfo(UserInfo usersInfo, Integer takeManner) {
         this.userNo = usersInfo;
         this.takeManner = takeManner;
     }

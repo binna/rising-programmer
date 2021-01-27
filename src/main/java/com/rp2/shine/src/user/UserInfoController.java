@@ -7,6 +7,7 @@ import com.rp2.shine.src.user.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.*;
 import java.util.List;
 
 import static com.rp2.shine.config.BaseResponseStatus.*;
@@ -26,9 +27,9 @@ public class UserInfoController {
      * [GET] /users?word=
      * @return BaseResponse<List<GetUsersRes>>
      */
-    //@ResponseBody
     @GetMapping("") // (GET) 127.0.0.1:9000/
     public BaseResponse<List<GetUsersRes>> getUsers(@RequestParam(required = false) String word) {
+        System.out.println(word);
         try {
             List<GetUsersRes> getUsersResList = userInfoProvider.retrieveUserInfoList(word);
 
@@ -50,7 +51,7 @@ public class UserInfoController {
      * @PathVariable userNo
      * @return BaseResponse<GetUserRes>
      */
-    //@ResponseBody
+    @ResponseBody
     @GetMapping("/{userNo}")
     public BaseResponse<GetUserRes> getUser(@PathVariable Integer userNo) {
         if (userNo == null || userNo <= 0) {
@@ -66,6 +67,27 @@ public class UserInfoController {
     }
 
     /**
+     * 회원 상세 조회 API
+     * [GET] /users/:userNo
+     * @PathVariable userNo
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/{userNo}/detail")
+    public BaseResponse<GetDetailRes> getDetailUser(@PathVariable Integer userNo) {
+        if (userNo == null || userNo <= 0) {
+            return new BaseResponse<>(EMPTY_USERNO);
+        }
+
+        try {
+            GetDetailRes getDetailRes = userInfoProvider.retrieveDetailUserInfo(userNo);
+            return new BaseResponse<>(SUCCESS_READ_USER, getDetailRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 회원가입 API
      * [POST] /users
      * @RequestBody PostUserReq
@@ -73,9 +95,9 @@ public class UserInfoController {
      */
     // @ResponseBody 이걸 파라미터 앞 (PostUserReq 앞)에 두면 json타입 같은거 받아오고 폼타입은 빼는 것
     // Json 같은 건 생성자만 있어도 되는데, 폼데이터의 경우엔 @Setter가 있어야 받아올 수 있음!
+    @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostUserRes> postUsers(PostUserReq parameters) {
-
+    public BaseResponse<PostUserRes> postUser(@RequestBody @Valid PostUserReq parameters) {
         // 1. Body Parameter Validation
         if (parameters.getNickname() == null || parameters.getNickname().length() == 0) {
             return new BaseResponse<>(EMPTY_NICKNAME);
@@ -95,14 +117,14 @@ public class UserInfoController {
 
     /**
      * 회원 정보 수정 API
-     * [PATCH] /users/profile/:userNo
+     * [PATCH] /users/:userNo/profile
      * @PathVariable userNo
      * @RequestBody PatchUserReq
      * @return BaseResponse<PatchUserRes>
      */
-    //@ResponseBody
-    @PatchMapping("/profile/{userNo}")
-    public BaseResponse<PatchUserRes> patchUsers(@PathVariable Integer userNo, PatchUserReq parameters) {
+    @ResponseBody
+    @PatchMapping("/{userNo}/profile")
+    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userNo, @RequestBody  PatchUserReq parameters) {
         if (userNo == null || userNo <= 0) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
@@ -121,7 +143,7 @@ public class UserInfoController {
      * @return BaseResponse<PostLoginRes>
      */
     @PostMapping("/login")
-    public BaseResponse<PostLoginRes> login(PostLoginReq parameters) {
+    public BaseResponse<PostLoginRes> login(@RequestBody PostLoginReq parameters) {
         // 1. Body Parameter Validation
         if (parameters.getPhoneNumber() == null || parameters.getPhoneNumber().length() == 0) {
             return new BaseResponse<>(EMPTY_PHONENUMBER);
@@ -130,7 +152,7 @@ public class UserInfoController {
         // 2. Login
         try {
             PostLoginRes postLoginRes = userInfoProvider.login(parameters);
-            return new BaseResponse<>(SUCCESS_LOGIN, postLoginRes);     // 코드 : 1013
+            return new BaseResponse<>(SUCCESS_LOGIN, postLoginRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -143,7 +165,7 @@ public class UserInfoController {
      * @return BaseResponse<Void>
      */
     @DeleteMapping("/{userNo}")
-    public BaseResponse<Void> deleteUsers(@PathVariable Integer userNo, @RequestParam(required = false) String reason) {
+    public BaseResponse<Void> deleteUser(@PathVariable Integer userNo, @RequestParam(required = false) String reason) {
         if (userNo == null || userNo <= 0) {
             return new BaseResponse<>(EMPTY_USERNO);
         }

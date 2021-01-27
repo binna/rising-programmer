@@ -1,12 +1,13 @@
 package com.rp2.shine.src.user;
 
-import com.rp2.shine.src.user.models.UsersInfo;
+import com.rp2.shine.src.user.models.UserInfo;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.user.models.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.rp2.shine.config.BaseResponseStatus.*;
 
@@ -23,8 +24,9 @@ public class UserInfoService {
      * @return PostUserRes
      * @throws BaseException
      */
+    @Transactional
     public PostUserRes createUserInfo(PostUserReq postUserReq) throws BaseException {
-        UsersInfo existsUserInfo = null;
+        UserInfo existsUserInfo = null;
 
         try {
             // 1-1. 이미 존재하는 회원이 있는지 조회 > 닉네임은 중복 가능하지만 휴대폰 번호는 중복 불가
@@ -46,7 +48,7 @@ public class UserInfoService {
         String profilePath = postUserReq.getProfilePath();
         String profileName = postUserReq.getProfileName();
 
-        UsersInfo userInfo = new UsersInfo(nickname, phoneNumber, profilePath, profileName);
+        UserInfo userInfo = new UserInfo(nickname, phoneNumber, profilePath, profileName);
 
         // 3. 유저 정보 저장
         try {
@@ -61,21 +63,22 @@ public class UserInfoService {
     }
 
     /**
-     * 회원 정보 수정 (POST uri 가 겹쳤을때의 예시 용도)
+     * 회원 정보 수정
      * @param patchUserReq
      * @return PatchUserRes
      * @throws BaseException
      */
+    @Transactional
     public PatchUserRes updateUserInfo(@NonNull Integer userNo, PatchUserReq patchUserReq) throws BaseException {
         // JWT 인증
         if(jwtService.getUserNo() != userNo) {
             throw new BaseException(INVALID_JWT);
         }
 
-        // 1. 존재하는 UserInfo가 있는지 확인 후 저장
-        UsersInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+        // 존재하는 UserInfo가 있는지 확인 후 저장
+        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
 
-        // 2. 해당 UserInfo의 nickname, profilePhoto or email or phoneNumber 사용자가 입력한 값으로 설정
+        // 해당 UserInfo의 nickname, profilePhoto or email or phoneNumber 사용자가 입력한 값으로 설정
         if(patchUserReq.getNickname() != null && !patchUserReq.getNickname().isEmpty()) {
             userInfo.setNickname(patchUserReq.getNickname());
             userInfo.setProfilePath(patchUserReq.getProfilePath());
@@ -93,12 +96,9 @@ public class UserInfoService {
 
         try {
             userInfoRepository.save(userInfo);
-            String nickname = userInfo.getNickname();
-            String profilePath = userInfo.getProfilePath();
-            String profileName = userInfo.getProfileName();
-            String email = userInfo.getEmail();
-            String phoneNumber = userInfo.getPhoneNumber();
-            return new PatchUserRes(userNo, nickname, profilePath, profileName, email, phoneNumber);
+
+            return new PatchUserRes(userNo, userInfo.getNickname(), userInfo.getProfilePath(),
+                    userInfo.getProfileName(), userInfo.getEmail(), userInfo.getPhoneNumber());
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_PATCH_USER);
         }
@@ -109,18 +109,21 @@ public class UserInfoService {
      * @param userNo, reason
      * @throws BaseException
      */
-    public void deleteUserInfo(int userNo, String reason) throws BaseException {
+    @Transactional
+    public void deleteUserInfo(Integer userNo, String reason) throws BaseException {
         // JWT 인증
         if(jwtService.getUserNo() != userNo) {
             throw new BaseException(INVALID_JWT);
         }
 
         // 1. 존재하는 UserInfo가 있는지 확인 후 저장
-        UsersInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
 
         // 2. 해당 UserInfo의 status를 N으로 설정
         userInfo.setStatus("N");
         userInfo.setWithdrawalReason(reason);
+        
+        // TODO 연관된 데이터들도 전부 상태값 N으로 만들어주는 작업 필요
 
         try {
             userInfoRepository.save(userInfo);

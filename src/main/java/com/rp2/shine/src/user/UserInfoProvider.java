@@ -1,12 +1,17 @@
 package com.rp2.shine.src.user;
 
 import com.rp2.shine.config.BaseException;
+import com.rp2.shine.src.review.ReviewProvider;
+import com.rp2.shine.src.review.models.ReviewInfo;
+import com.rp2.shine.src.review.models.GetReviewRes;
+import com.rp2.shine.src.usedstore.UsedStoreProvider;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.src.user.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.rp2.shine.config.BaseResponseStatus.*;
@@ -16,16 +21,23 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 @Service
 public class UserInfoProvider {
     private final UserInfoRepository userInfoRepository;
+    private final MannerScoreRepository mannerScoreRepository;
+    private final UsedStoreProvider usedStoreProvider;
+    private final ReviewProvider reviewProvider;
     private final JwtService jwtService;
 
     /**
-     * 전체 회원 조회
+     * 전체 회원 조회, 닉네임 회원 검색 조회
+     * @param word
      * @return List<UserInfoRes>
      * @throws BaseException
+     * @comment param word 필수 아님, 간단한 회원정보
      */
+    @Transactional
     public List<GetUsersRes> retrieveUserInfoList(String word) throws BaseException {
         // 1. DB에서 전체 UserInfo 조회
-        List<UsersInfo> userInfoList;
+        List<UserInfo> userInfoList;
+        System.out.println(word);
         try {
             if (word == null) {     // 전체 조회
                 userInfoList = userInfoRepository.findByStatus("Y");
@@ -38,26 +50,127 @@ public class UserInfoProvider {
 
         // 2. UserInfoRes로 변환하여 return
         return userInfoList.stream().map(userInfo -> {
-            return new GetUsersRes(userInfo.getUserNo(),
-                    userInfo.getNickname(), userInfo.getPhoneNumber(), userInfo.getProfilePath(), userInfo.getProfileName(),
-                    userInfo.getCreateDate(), userInfo.getUpdateDate(), userInfo.getStatus());
+            return new GetUsersRes(userInfo.getNickname(), userInfo.getPhoneNumber(),
+                    userInfo.getProfilePath(), userInfo.getProfileName());
             }).collect(Collectors.toList());
     }
 
     /**
      * 회원 조회
      * @param userNo
-     * @return UserInfoDetailRes
+     * @return GetUserRes
      * @throws BaseException
      */
+    @Transactional
     public GetUserRes retrieveUserInfo(Integer userNo) throws BaseException {
         // 1. DB에서 userId로 UserInfo 조회
-        UsersInfo userInfo = retrieveUserInfoByUserNO(userNo);
+        UserInfo userInfo = retrieveUserInfoByUserNO(userNo);
 
         // 2. UserInfoRes로 변환하여 return
         String nickname = userInfo.getNickname();
         String phoneNumber = userInfo.getPhoneNumber();
-        return new GetUserRes(userNo, nickname, phoneNumber);
+        return new GetUserRes(userNo, nickname, phoneNumber,
+                userInfo.getProfilePath(), userInfo.getProfileName(),
+                userInfo.getCreateDate(), userInfo.getUpdateDate(), userInfo.getStatus());
+    }
+
+    /**
+     * 회원 조회
+     * @param userNo
+     * @return GetDetailRes
+     * @throws BaseException
+     * @comment 디테일한 회원정보 -> 프로필 정보
+     */
+    @Transactional
+    public GetDetailRes retrieveDetailUserInfo(Integer userNo) throws BaseException {
+        // JWT 인증
+        if(jwtService.getUserNo() != userNo) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        // 회원 기본 정보 노출
+        UserInfo userInfo = retrieveUserInfoByUserNO(userNo);
+
+        // 매너 온도, 매너 평가 노출
+        List<MannerScoreInfo> mannerScoreInfoList = retrieveMannerScoreInfoByUserNo(userInfo);
+        HashMap<String, Integer> mannerScore = new HashMap<>();
+        int plusCnt = 0, minusCnt = 0;
+        int[] plus = new int[8];
+        int[] minus = new int[8];
+        String[] message = {
+                "친절하고 매너가 좋아요",
+                "시간 약속을 잘 지켜요",
+                "상품상태가 설명한 것과 같아요",
+                "상품설명이 자세해요",
+                "좋은 상품을 저렴하게 판매해요",
+                "응답이 빨라요",
+                "제가 있는 곳까지 와서 거래했어요",
+                "무료로 나눠주셨어요",
+                "불친절해요",
+                "시간 약속을 지키지 않아요",
+                "상품상태가 설명한 것과 달라요",
+                "상품 설명이 성의 없어요",
+                "구매 가격보다 비싼 가격으로 판매해요",
+                "너무 늦은 시간이나 새벽에 연락해요",
+                "구매의사 없이 계속 찔러봐요",
+                "질문해도 답이 없어요",
+        };
+        for (MannerScoreInfo manner : mannerScoreInfoList) {
+            if(manner.getTakeManner() > 0) {
+                plus[manner.getTakeManner() - 1]++;
+                plusCnt++;
+            } else {
+                minus[manner.getTakeManner() - 1]++;
+                minusCnt++;
+            }
+        }
+        double temperature = 36.5 + (plusCnt * 0.1) - (minusCnt * 0.1);
+
+        for(int i = 0; i < 8; i++) {
+            if(plus[i] > 0) {
+                mannerScore.put(message[i], plus[i]);
+            }
+            System.out.println(message[i]);
+        }
+        for(int i = 0; i < 8; i++) {
+            if(minus[i] > 0) {
+                mannerScore.put(message[8 + i], minus[i]);
+            }
+            System.out.println(message[i + 8]);
+        }
+
+        // SellPosting 개수 조회
+        int sellpostingCnt = usedStoreProvider.retrieveSellPostingInfoBySellerUserNo(userInfo).size();
+
+        // review
+        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveALL(userNo);
+        List<GetReviewRes> reviews = new ArrayList<>();
+
+        for (ReviewInfo review : reviewInfoList) {
+            reviews.add(new GetReviewRes(review.getWriter(), review.getFileName(), review.getFilePath(), review.getContent(), review.getCreateDate()));
+        }
+
+        return new GetDetailRes(userInfo.getUserNo(), userInfo.getNickname(), userInfo.getPhoneNumber(),
+                userInfo.getProfilePath(), userInfo.getProfileName(),
+                userInfo.getCreateDate(), userInfo.getUpdateDate(), userInfo.getStatus(),
+                sellpostingCnt, temperature, mannerScore, reviews);
+    }
+
+    /**
+     * 전체 매너 조회
+     * @param userNo
+     * @return List<MannerScoreInfo>
+     * @throws BaseException
+     */
+    @Transactional
+    public List<MannerScoreInfo> retrieveMannerScoreInfoByUserNo(UserInfo userNo) throws BaseException {
+        List<MannerScoreInfo> mannerScoreInfoList;
+        try {
+            mannerScoreInfoList = mannerScoreRepository.findByUserNo(userNo);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+        return mannerScoreInfoList;
     }
 
     /**
@@ -66,9 +179,10 @@ public class UserInfoProvider {
      * @return PostLoginRes
      * @throws BaseException
      */
+    @Transactional
     public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException {
         // 1. DB에서 PhoneNumber로 UserInfo 조회
-        UsersInfo userInfo = retrieveUserInfoByPhoneNumber(postLoginReq.getPhoneNumber());
+        UserInfo userInfo = retrieveUserInfoByPhoneNumber(postLoginReq.getPhoneNumber());
 
         // 2. Create JWT
         String jwt = jwtService.createJwt(userInfo.getUserNo());
@@ -82,10 +196,12 @@ public class UserInfoProvider {
      * @param userNo
      * @return UserInfo
      * @throws BaseException
+     * @comment UserNo로 회원조회
      */
-    public UsersInfo retrieveUserInfoByUserNO(Integer userNo) throws BaseException {
+    @Transactional
+    public UserInfo retrieveUserInfoByUserNO(Integer userNo) throws BaseException {
         // 1. DB에서 UserInfo 조회
-        UsersInfo userInfo;
+        UserInfo userInfo;
         try {
             userInfo = userInfoRepository.findById(userNo).orElse(null);
         } catch (Exception ignored) {
@@ -103,12 +219,13 @@ public class UserInfoProvider {
 
     /**
      * 회원 조회
-     *
      * @param phoneNumber
-     * @return UserInfo
+     * @return UsersInfo
      * @throws BaseException
+     * @comment phoneNumber로 회원조회
      */
-    public UsersInfo retrieveUserInfoByPhoneNumber(String phoneNumber) throws BaseException {
+    @Transactional
+    public UserInfo retrieveUserInfoByPhoneNumber(String phoneNumber) throws BaseException {
         // findByPhoneNumber로 UserInfo 옵셔널을 받아오세요(그냥 있는지 없는지 모르는 값 포장해둔거)
         // 있다면 리턴하세요
         /*return userInfoRepository.findByPhoneNumber(phoneNumber)
@@ -116,19 +233,19 @@ public class UserInfoProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));*/
 
         // 1. phoneNumber을 이용해서 UserInfo DB 접근 =======================================
-        List<UsersInfo> existsUserInfoList;
+        List<UserInfo> existsUserInfoList;
         try {
             existsUserInfoList = userInfoRepository.findByPhoneNumber(phoneNumber);
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER);    // 에러코드 : 3012
+            throw new BaseException(FAILED_TO_GET_USER);
         }
 
         // 2. 존재하는 UserInfo가 있는지 확인
-        UsersInfo userInfo;
+        UserInfo userInfo;
         if (existsUserInfoList != null && existsUserInfoList.size() > 0) {
             userInfo = existsUserInfoList.get(0);
         } else {
-            throw new BaseException(NOT_FOUND_USER);        // 에러코드 : 3010
+            throw new BaseException(NOT_FOUND_USER);
         }
 
         // 3. UserInfo를 return
