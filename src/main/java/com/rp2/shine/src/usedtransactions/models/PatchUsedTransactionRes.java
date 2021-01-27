@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class PatchUsedStoreRes {
+public class PatchUsedTransactionRes {
     private final int postingNo;
     private final int sellerUserNo;
     private final String title;
@@ -19,5 +19,5 @@ public class PatchUsedStoreRes {
     private final Date updateDate;
     private final String status;
     private final Integer price;
-    private List<PhotoRes> sellPostingPhoto;
+    private final List<PhotoRes> postingPhoto;
 }

@@ -21,11 +21,11 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
-public class UsedTransactionsService {
+public class UsedTransactionService {
     private final PostingInfoRepository postingInfoRepository;
     private final PostConcernRepository postConcernsRepository;
     private final UserInfoRepository userInfoRepository;
-    private final UsedTransactionsProvider usedStoreProvider;
+    private final UsedTransactionProvider usedStoreProvider;
     private final UserInfoProvider userInfoProvider;
     private final JwtService jwtService;
 
@@ -78,7 +78,7 @@ public class UsedTransactionsService {
      * @throws BaseException
      */
     @Transactional
-    public PatchUsedStoreRes updateUsedStoreInfo(@NonNull Integer sellerUserNo, @NonNull Integer sellPostingNo, PatchUsedStoreReq patchUsedReq) throws BaseException {
+    public PatchUsedTransactionRes updateUsedStoreInfo(@NonNull Integer sellerUserNo, @NonNull Integer sellPostingNo, PatchUsedTransactionReq patchUsedReq) throws BaseException {
         // TODO JWT 인증
 
         // 존재하는 포스팅, 사진 확인
@@ -114,7 +114,7 @@ public class UsedTransactionsService {
         for (SellPostingPhotoInfo photo : sellPostingInfo.getSellPostingPhotoInfoList()) {
             postPhotoResList.add(new PhotoRes(photo.getPhotoNo(), photo.getFilePath(), photo.getFileName(), photo.getStatus()));
         }
-        return new PatchUsedStoreRes(sellPostingInfo.getPostingNo(), sellPostingInfo.getPostingNo(),
+        return new PatchUsedTransactionRes(sellPostingInfo.getPostingNo(), sellPostingInfo.getPostingNo(),
                 sellPostingInfo.getTitle(), sellPostingInfo.getContent(), sellPostingInfo.getCategory(),
                 sellPostingInfo.getCreateDate(), sellPostingInfo.getUpdateDate(), sellPostingInfo.getStatus(),
                 sellPostingInfo.getPrice(), postPhotoResList);

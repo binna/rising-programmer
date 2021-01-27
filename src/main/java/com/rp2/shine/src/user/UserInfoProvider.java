@@ -4,7 +4,7 @@ import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.review.ReviewProvider;
 import com.rp2.shine.src.review.models.ReviewInfo;
 import com.rp2.shine.src.review.models.GetReviewRes;
-import com.rp2.shine.src.usedtransactions.UsedTransactionsProvider;
+import com.rp2.shine.src.usedtransactions.UsedTransactionProvider;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.src.user.models.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 public class UserInfoProvider {
     private final UserInfoRepository userInfoRepository;
     private final MannerScoreRepository mannerScoreRepository;
-    private final UsedTransactionsProvider usedTransactionsProvider;
+    private final UsedTransactionProvider usedTransactionsProvider;
     private final ReviewProvider reviewProvider;
     private final JwtService jwtService;
 

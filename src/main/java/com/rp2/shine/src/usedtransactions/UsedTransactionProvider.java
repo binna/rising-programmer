@@ -13,7 +13,7 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
-public class UsedTransactionsProvider {
+public class UsedTransactionProvider {
     private final PostingInfoRepository sellPostingInfoRepository;
     private final PostConcernRepository postConcernsRepository;
 

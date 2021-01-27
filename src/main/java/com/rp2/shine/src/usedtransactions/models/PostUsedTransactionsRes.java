@@ -19,5 +19,5 @@ public class PostUsedTransactionsRes {
     private final Date updateDate;
     private final String status;
     private final Integer price;
-    private List<PhotoRes> postingPhoto;
+    private final List<PhotoRes> postingPhoto;
 }

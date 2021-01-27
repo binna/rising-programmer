@@ -11,8 +11,8 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/usedtransactions")
-public class UsedTransactionsController {
-    private final UsedTransactionsService usedTransactionsService;
+public class UsedTransactionController {
+    private final UsedTransactionService usedTransactionsService;
 
     /**
      * 중고거래 글 등록 API
@@ -56,7 +56,7 @@ public class UsedTransactionsController {
      * @return BaseResponse<PatchUserRes>
      */
     @PatchMapping("/{sellerUserNo}/{sellPostingNo}")
-    public BaseResponse<PatchUsedStoreRes> patchUsedStrore(@PathVariable Integer sellerUserNo, @PathVariable Integer sellPostingNo, PatchUsedStoreReq parameters) {
+    public BaseResponse<PatchUsedTransactionRes> patchUsedStrore(@PathVariable Integer sellerUserNo, @PathVariable Integer sellPostingNo, PatchUsedTransactionReq parameters) {
 
         if (sellerUserNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);
@@ -78,7 +78,7 @@ public class UsedTransactionsController {
         }
 
         try {
-            PatchUsedStoreRes patchUsedStoreRes = usedTransactionsService.updateUsedStoreInfo(sellerUserNo, sellPostingNo, parameters);
+            PatchUsedTransactionRes patchUsedStoreRes = usedTransactionsService.updateUsedStoreInfo(sellerUserNo, sellPostingNo, parameters);
             return new BaseResponse<>(SUCCESS_PATCH_USEDSTORE, patchUsedStoreRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

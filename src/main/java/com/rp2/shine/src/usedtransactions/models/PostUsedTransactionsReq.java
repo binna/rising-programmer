@@ -14,5 +14,5 @@ public class PostUsedTransactionsReq {
     private String content;
     private String category;
     private Integer price;
-    private List<PhotoReq> sellPostingPhoto;
+    private List<PhotoReq> postingPhoto;
 }

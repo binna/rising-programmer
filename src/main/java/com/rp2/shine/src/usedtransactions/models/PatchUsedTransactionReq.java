@@ -9,10 +9,10 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class PatchUsedStoreReq {
+public class PatchUsedTransactionReq {
     private String title;
     private String content;
     private String category;
     private Integer price;
-    private List<PhotoReq> sellPostingPhoto;
+    private List<PhotoReq> postingPhoto;
 }
