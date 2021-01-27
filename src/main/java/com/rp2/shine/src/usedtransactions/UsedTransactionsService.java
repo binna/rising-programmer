@@ -1,12 +1,12 @@
-package com.rp2.shine.src.usedstore;
+package com.rp2.shine.src.usedtransactions;
 
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.common.PhotoReq;
 import com.rp2.shine.src.common.PhotoRes;
-import com.rp2.shine.src.usedstore.models.*;
+import com.rp2.shine.src.usedtransactions.models.*;
 import com.rp2.shine.src.user.UserInfoProvider;
 import com.rp2.shine.src.user.UserInfoRepository;
-import com.rp2.shine.src.user.models.UsersInfo;
+import com.rp2.shine.src.user.models.UserInfo;
 import com.rp2.shine.utils.JwtService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
-public class UsedStoreService {
+public class UsedTransactionsService {
     private final PostingInfoRepository postingInfoRepository;
-    private final PostConcernsRepository postConcernsRepository;
+    private final PostConcernRepository postConcernsRepository;
     private final UserInfoRepository userInfoRepository;
-    private final UsedStoreProvider usedStoreProvider;
+    private final UsedTransactionsProvider usedStoreProvider;
     private final UserInfoProvider userInfoProvider;
     private final JwtService jwtService;
 
@@ -36,23 +36,19 @@ public class UsedStoreService {
      * @throws BaseException
      */
     @Transactional
-    public PostUsedStoreRes createUsedStore(Integer sellerUserNo, PostUsedStoreReq postUsedStoreReq) throws BaseException {
+    public PostUsedTransactionsRes createUsedTransactions(Integer sellerUserNo, PostUsedTransactionsReq postUsedStoreReq) throws BaseException {
         // TODO JWT 인증
 
         // 중고거래 글 생성
-        UsersInfo userInfo = userInfoRepository.findById(sellerUserNo).orElseThrow(() -> new BaseException(FAILED_TO_GET_USER));
-        String title = postUsedStoreReq.getTitle();
-        String content = postUsedStoreReq.getContent();
-        String category = postUsedStoreReq.getCategory();
-        Integer price = postUsedStoreReq.getPrice();
-
+        UserInfo userInfo = userInfoRepository.findById(sellerUserNo).orElseThrow(() -> new BaseException(FAILED_TO_GET_USER));
         List<SellPostingPhotoInfo> sellPostingPhotoInfoList = new ArrayList<>();
         for(PhotoReq photo : postUsedStoreReq.getSellPostingPhoto()) {
             SellPostingPhotoInfo sellPostingPhotoInfo = new SellPostingPhotoInfo(photo.getFilePath(), photo.getFileName());
             sellPostingPhotoInfoList.add(sellPostingPhotoInfo);
         }
 
-        SellPostingInfo sellPostingInfo = new SellPostingInfo(userInfo, title, content, category, price);
+        SellPostingInfo sellPostingInfo = new SellPostingInfo(userInfo, postUsedStoreReq.getTitle(),
+                postUsedStoreReq.getContent(), postUsedStoreReq.getCategory(), postUsedStoreReq.getPrice());
         sellPostingInfo.setSellPostingPhotoInfo(sellPostingPhotoInfoList);
 
         // 중고거래 글 등록
@@ -63,13 +59,13 @@ public class UsedStoreService {
             throw new BaseException(FAILED_TO_POST_USEDSTORE);
         }
 
-        // 4. UserInfoLoginRes로 변환하여 return
+        // UserInfoLoginRes로 변환하여 return
         List<PhotoRes> postPhotoResList = sellPostingInfo.getSellPostingPhotoInfoList().stream()
                 .map(sellPostingPhotoInfo -> new PhotoRes(sellPostingPhotoInfo.getPhotoNo(),
                         sellPostingPhotoInfo.getFilePath(), sellPostingPhotoInfo.getFileName(), sellPostingPhotoInfo.getStatus()))
                 .collect(Collectors.toList());
 
-        return new PostUsedStoreRes(sellPostingInfo.getPostingNo(), userInfo.getUserNo(),
+        return new PostUsedTransactionsRes(sellPostingInfo.getPostingNo(), userInfo.getUserNo(),
                 sellPostingInfo.getTitle(), sellPostingInfo.getContent(), sellPostingInfo.getCategory(),
                 sellPostingInfo.getCreateDate(), sellPostingInfo.getUpdateDate(), sellPostingInfo.getStatus(),
                 sellPostingInfo.getPrice(), postPhotoResList);
@@ -169,7 +165,7 @@ public class UsedStoreService {
         // TODO JWT 인증
 
         SellPostingConsernInfo existsConsernInfo = null;
-        UsersInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
         SellPostingInfo sellPostingInfo = usedStoreProvider.retrieveSellPostingInfoByPostingNo(potingNo);
         try {
             existsConsernInfo = usedStoreProvider.retrieveSellPostingConsernInfoByConcernUserNo(usersInfo, sellPostingInfo);
@@ -205,7 +201,7 @@ public class UsedStoreService {
         // TODO JWT 인증
 
         // 1. 존재하는 UserInfo가 있는지 확인 후 저장
-        UsersInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
         SellPostingInfo sellPostingInfo = usedStoreProvider.retrieveSellPostingInfoByPostingNo(potingNo);
         SellPostingConsernInfo sellPostingConsernInfo = usedStoreProvider.retrieveSellPostingConsernInfoByConcernUserNo(usersInfo, sellPostingInfo);
 

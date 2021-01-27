@@ -1,9 +1,9 @@
-package com.rp2.shine.src.usedstore;
+package com.rp2.shine.src.usedtransactions;
 
 import com.rp2.shine.config.BaseException;
-import com.rp2.shine.src.usedstore.models.SellPostingConsernInfo;
-import com.rp2.shine.src.usedstore.models.SellPostingInfo;
-import com.rp2.shine.src.user.models.UsersInfo;
+import com.rp2.shine.src.usedtransactions.models.SellPostingConsernInfo;
+import com.rp2.shine.src.usedtransactions.models.SellPostingInfo;
+import com.rp2.shine.src.user.models.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +13,12 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
-public class UsedStoreProvider {
+public class UsedTransactionsProvider {
     private final PostingInfoRepository sellPostingInfoRepository;
-    private final PostConcernsRepository postConcernsRepository;
+    private final PostConcernRepository postConcernsRepository;
 
     /**
-     * 포스팅 조회
-     *
+     * 판매글 조회
      * @param sellPostingNo
      * @return SellPostingInfo
      * @throws BaseException
@@ -38,13 +37,30 @@ public class UsedStoreProvider {
     }
 
     /**
+     * 판매글 조회
+     * @param sellerUserNo
+     * @return List<SellPostingInfo>
+     * @throws BaseException
+     */
+    public List<SellPostingInfo> retrieveSellPostingInfoBySellerUserNo(UserInfo sellerUserNo) throws BaseException {
+        List<SellPostingInfo> sellPostingInfoList;
+
+        try {
+            sellPostingInfoList = sellPostingInfoRepository.findBySellerUserNoAndStatus(sellerUserNo, "Y");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+
+        return sellPostingInfoList;
+    }
+
+    /**
      * 관심 등록 조회
-     *
      * @param concernUserNo
      * @return SellPostingConsernInfo
      * @throws BaseException
      */
-    public SellPostingConsernInfo retrieveSellPostingConsernInfoByConcernUserNo(UsersInfo concernUserNo, SellPostingInfo sellPostingInfo) throws BaseException {
+    public SellPostingConsernInfo retrieveSellPostingConsernInfoByConcernUserNo(UserInfo concernUserNo, SellPostingInfo sellPostingInfo) throws BaseException {
         List<SellPostingConsernInfo> existsConsernInfoList;
         try {
             existsConsernInfoList = postConcernsRepository.findByConcernUserNoAndPostingNo(concernUserNo, sellPostingInfo);

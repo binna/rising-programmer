@@ -40,6 +40,10 @@ dependencies {
     // Security, Authentication
     implementation 'org.springframework.boot:spring-boot-starter-security'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0'
+
+    // 유효성 검사를 위해 추가
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation('org.springframework.boot:spring-boot-starter-validation')
 }
 
 test {

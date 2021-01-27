@@ -1,4 +1,4 @@
-package com.rp2.shine.src.usedstore.models;
+package com.rp2.shine.src.usedtransactions.models;
 
 import com.rp2.shine.src.common.PhotoReq;
 import lombok.*;

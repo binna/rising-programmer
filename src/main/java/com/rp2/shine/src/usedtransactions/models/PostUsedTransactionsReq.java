@@ -1,4 +1,4 @@
-package com.rp2.shine.src.usedstore.models;
+package com.rp2.shine.src.usedtransactions.models;
 
 import com.rp2.shine.src.common.PhotoReq;
 import lombok.*;
@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class PostUsedStoreReq {
+public class PostUsedTransactionsReq {
     private Integer sellerUserNo;
     private String title;
     private String content;

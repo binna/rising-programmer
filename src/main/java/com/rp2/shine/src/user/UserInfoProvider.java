@@ -4,7 +4,7 @@ import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.review.ReviewProvider;
 import com.rp2.shine.src.review.models.ReviewInfo;
 import com.rp2.shine.src.review.models.GetReviewRes;
-import com.rp2.shine.src.usedstore.UsedStoreProvider;
+import com.rp2.shine.src.usedtransactions.UsedTransactionsProvider;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.src.user.models.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 public class UserInfoProvider {
     private final UserInfoRepository userInfoRepository;
     private final MannerScoreRepository mannerScoreRepository;
-    private final UsedStoreProvider usedStoreProvider;
+    private final UsedTransactionsProvider usedTransactionsProvider;
     private final ReviewProvider reviewProvider;
     private final JwtService jwtService;
 
@@ -37,7 +37,6 @@ public class UserInfoProvider {
     public List<GetUsersRes> retrieveUserInfoList(String word) throws BaseException {
         // 1. DB에서 전체 UserInfo 조회
         List<UserInfo> userInfoList;
-        System.out.println(word);
         try {
             if (word == null) {     // 전체 조회
                 userInfoList = userInfoRepository.findByStatus("Y");
@@ -140,10 +139,10 @@ public class UserInfoProvider {
         }
 
         // SellPosting 개수 조회
-        int sellpostingCnt = usedStoreProvider.retrieveSellPostingInfoBySellerUserNo(userInfo).size();
+        int sellpostingCnt = usedTransactionsProvider.retrieveSellPostingInfoBySellerUserNo(userInfo).size();
 
         // review
-        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveALL(userNo);
+        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewALL(userNo);
         List<GetReviewRes> reviews = new ArrayList<>();
 
         for (ReviewInfo review : reviewInfoList) {

@@ -1,8 +1,8 @@
-package com.rp2.shine.src.usedstore;
+package com.rp2.shine.src.usedtransactions;
 
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.config.BaseResponse;
-import com.rp2.shine.src.usedstore.models.*;
+import com.rp2.shine.src.usedtransactions.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,21 +10,20 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/usedstore")
-public class UsedStoreController {
-    private final UsedStoreService usedStoreService;
+@RequestMapping("/usedtransactions")
+public class UsedTransactionsController {
+    private final UsedTransactionsService usedTransactionsService;
 
     /**
      * 중고거래 글 등록 API
-     * [POST] /usedstore/:sellerUserNo
+     * [POST] /usedtransactions/:userNo
      * @PathVariable sellerUserNo
      * @RequestBody PostUsedStoreReq
-     * @return BaseResponse<PostUsedStoreRes>
+     * @return BaseResponse<PostUsedTransactionsRes>
      */
-    @PostMapping("/{sellerUserNo}")
-    public BaseResponse<PostUsedStoreRes> postUsedStore(@PathVariable Integer sellerUserNo, PostUsedStoreReq parameters) {
-        // 1. Body Parameter Validation
-        if(sellerUserNo == null) {
+    @PostMapping("/{userNo}")
+    public BaseResponse<PostUsedTransactionsRes> postUsedTransactions(@PathVariable Integer userNo, PostUsedTransactionsReq parameters) {
+        if(userNo == null) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
         if (parameters.getTitle() == null || parameters.getTitle().length() == 0) {
@@ -40,12 +39,11 @@ public class UsedStoreController {
             return new BaseResponse<>(EMPTY_PRICE);
         }
 
-        // 2. Post UserInfo
         try {
-            PostUsedStoreRes postUsedStoreRes = usedStoreService.createUsedStore(sellerUserNo, parameters);
+            PostUsedTransactionsRes postUsedStoreRes = usedTransactionsService.createUsedTransactions(userNo, parameters);
             return new BaseResponse<>(SUCCESS_POST_USEDSTORE, postUsedStoreRes);
         } catch (BaseException exception) {
-            exception.printStackTrace();    // 에러 이유 추척
+            //exception.printStackTrace();
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -80,7 +78,7 @@ public class UsedStoreController {
         }
 
         try {
-            PatchUsedStoreRes patchUsedStoreRes = usedStoreService.updateUsedStoreInfo(sellerUserNo, sellPostingNo, parameters);
+            PatchUsedStoreRes patchUsedStoreRes = usedTransactionsService.updateUsedStoreInfo(sellerUserNo, sellPostingNo, parameters);
             return new BaseResponse<>(SUCCESS_PATCH_USEDSTORE, patchUsedStoreRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -103,7 +101,7 @@ public class UsedStoreController {
         }
 
         try {
-            usedStoreService.deleteUsedStore(sellPostingNo);
+            usedTransactionsService.deleteUsedStore(sellPostingNo);
             return new BaseResponse<>(SUCCESS_DELETE_USEDSTORE);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -128,7 +126,7 @@ public class UsedStoreController {
 
         // 2. Post UserInfo
         try {
-            PostConcernRes postConcernRes = usedStoreService.createConcern(postingNo, userNo);
+            PostConcernRes postConcernRes = usedTransactionsService.createConcern(postingNo, userNo);
             return new BaseResponse<>(SUCCESS_POST_CONCERN, postConcernRes);
         } catch (BaseException exception) {
             //exception.printStackTrace();    // 에러 이유 추척
@@ -153,7 +151,7 @@ public class UsedStoreController {
         }
 
         try {
-            usedStoreService.deleteConcern(postingNo, userNo);
+            usedTransactionsService.deleteConcern(postingNo, userNo);
             return new BaseResponse<>(SUCCESS_DELETE_CONCERN);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
