@@ -29,13 +29,12 @@ public class UserInfoProvider {
     /**
      * 전체 회원 조회, 닉네임 회원 검색 조회
      * @param word
-     * @return List<UserInfoRes>
+     * @return List<GetUsersRes>
      * @throws BaseException
      * @comment param word 필수 아님, 간단한 회원정보
      */
     @Transactional
     public List<GetUsersRes> retrieveUserInfoList(String word) throws BaseException {
-        // 1. DB에서 전체 UserInfo 조회
         List<UserInfo> userInfoList;
         try {
             if (word == null) {     // 전체 조회
@@ -47,7 +46,6 @@ public class UserInfoProvider {
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
-        // 2. UserInfoRes로 변환하여 return
         return userInfoList.stream().map(userInfo -> {
             return new GetUsersRes(userInfo.getNickname(), userInfo.getPhoneNumber(),
                     userInfo.getProfilePath(), userInfo.getProfileName());
@@ -62,13 +60,9 @@ public class UserInfoProvider {
      */
     @Transactional
     public GetUserRes retrieveUserInfo(Integer userNo) throws BaseException {
-        // 1. DB에서 userId로 UserInfo 조회
         UserInfo userInfo = retrieveUserInfoByUserNO(userNo);
 
-        // 2. UserInfoRes로 변환하여 return
-        String nickname = userInfo.getNickname();
-        String phoneNumber = userInfo.getPhoneNumber();
-        return new GetUserRes(userNo, nickname, phoneNumber,
+        return new GetUserRes(userNo, userInfo.getNickname(), userInfo.getPhoneNumber(),
                 userInfo.getProfilePath(), userInfo.getProfileName(),
                 userInfo.getCreateDate(), userInfo.getUpdateDate(), userInfo.getStatus());
     }
@@ -129,13 +123,11 @@ public class UserInfoProvider {
             if(plus[i] > 0) {
                 mannerScore.put(message[i], plus[i]);
             }
-            System.out.println(message[i]);
         }
         for(int i = 0; i < 8; i++) {
             if(minus[i] > 0) {
                 mannerScore.put(message[8 + i], minus[i]);
             }
-            System.out.println(message[i + 8]);
         }
 
         // SellPosting 개수 조회
@@ -156,7 +148,7 @@ public class UserInfoProvider {
     }
 
     /**
-     * 전체 매너 조회
+     * 회원별 매너 점수 검색
      * @param userNo
      * @return List<MannerScoreInfo>
      * @throws BaseException
@@ -167,7 +159,7 @@ public class UserInfoProvider {
         try {
             mannerScoreInfoList = mannerScoreRepository.findByUserNo(userNo);
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER);
+            throw new BaseException(FAILED_TO_GET_MANNERSCORE);
         }
         return mannerScoreInfoList;
     }
@@ -180,13 +172,13 @@ public class UserInfoProvider {
      */
     @Transactional
     public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException {
-        // 1. DB에서 PhoneNumber로 UserInfo 조회
+        // DB에서 PhoneNumber로 UserInfo 조회
         UserInfo userInfo = retrieveUserInfoByPhoneNumber(postLoginReq.getPhoneNumber());
 
-        // 2. Create JWT
+        // Create JWT
         String jwt = jwtService.createJwt(userInfo.getUserNo());
 
-        // 3. PostLoginRes 변환하여 return
+        // PostLoginRes 변환하여 return
         return new PostLoginRes(userInfo.getUserNo(), jwt);
     }
 
@@ -199,7 +191,7 @@ public class UserInfoProvider {
      */
     @Transactional
     public UserInfo retrieveUserInfoByUserNO(Integer userNo) throws BaseException {
-        // 1. DB에서 UserInfo 조회
+        // DB에서 UserInfo 조회
         UserInfo userInfo;
         try {
             userInfo = userInfoRepository.findById(userNo).orElse(null);
@@ -207,12 +199,12 @@ public class UserInfoProvider {
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
-        // 2. 존재하는 회원인지 확인
+        // 존재하는 회원인지 확인
         if (userInfo == null || !userInfo.getStatus().equals("Y")) {
             throw new BaseException(NOT_FOUND_USER);
         }
 
-        // 3. UserInfo를 return
+        // UserInfo를 return
         return userInfo;
     }
 
@@ -231,7 +223,7 @@ public class UserInfoProvider {
                 // 만약에 없으면 다음 예외를 던져주세요
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));*/
 
-        // 1. phoneNumber을 이용해서 UserInfo DB 접근 =======================================
+        // phoneNumber을 이용해서 UserInfo DB 접근 =======================================
         List<UserInfo> existsUserInfoList;
         try {
             existsUserInfoList = userInfoRepository.findByPhoneNumber(phoneNumber);
@@ -239,7 +231,7 @@ public class UserInfoProvider {
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
-        // 2. 존재하는 UserInfo가 있는지 확인
+        // 존재하는 UserInfo가 있는지 확인
         UserInfo userInfo;
         if (existsUserInfoList != null && existsUserInfoList.size() > 0) {
             userInfo = existsUserInfoList.get(0);
@@ -247,7 +239,7 @@ public class UserInfoProvider {
             throw new BaseException(NOT_FOUND_USER);
         }
 
-        // 3. UserInfo를 return
+        // UserInfo를 return
         return userInfo;
     }
 }

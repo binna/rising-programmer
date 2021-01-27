@@ -48,7 +48,7 @@ public class UsedTransactionsProvider {
         try {
             sellPostingInfoList = sellPostingInfoRepository.findBySellerUserNoAndStatus(sellerUserNo, "Y");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER);
+            throw new BaseException(FAILED_TO_GET_POSTING);
         }
 
         return sellPostingInfoList;

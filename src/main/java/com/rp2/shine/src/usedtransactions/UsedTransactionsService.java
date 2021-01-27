@@ -56,7 +56,7 @@ public class UsedTransactionsService {
             sellPostingInfo = postingInfoRepository.save(sellPostingInfo);
         } catch (Exception exception) {
             //exception.printStackTrace();    // 에러 이유 추척
-            throw new BaseException(FAILED_TO_POST_USEDSTORE);
+            throw new BaseException(FAILED_TO_POST_POSTING);
         }
 
         // UserInfoLoginRes로 변환하여 return
@@ -107,7 +107,7 @@ public class UsedTransactionsService {
             postingInfoRepository.save(sellPostingInfo);
         } catch (Exception exception) {
             //exception.printStackTrace();
-            throw new BaseException(FAILED_TO_PATCH_USEDSTORE);
+            throw new BaseException(FAILED_TO_PATCH_POSTING);
         }
 
         List<PhotoRes> postPhotoResList = new ArrayList<>();
@@ -150,7 +150,7 @@ public class UsedTransactionsService {
             postingInfoRepository.save(sellPostingInfo);
         } catch (Exception exception) {
             //exception.printStackTrace();
-            throw new BaseException(FAILED_TO_DELETE_USEDSTORE);
+            throw new BaseException(FAILED_TO_DELETE_POSTING);
         }
     }
 

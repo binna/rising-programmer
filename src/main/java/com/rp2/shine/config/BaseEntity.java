@@ -11,7 +11,7 @@ import java.util.Date;
 @Getter
 @Setter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)      // DB insert/update 시에 자동으로 하게끔 해준다 -> 얘랑 짝궁으로 application에도 해줘야 한다.
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     @CreationTimestamp
     @Column(name = "createDate", nullable = false, updatable = false)

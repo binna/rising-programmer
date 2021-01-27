@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.rp2.shine.config.BaseResponseStatus.FAILED_TO_GET_USER;
+import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -16,7 +16,7 @@ public class ReviewProvider {
     private final ReviewRepository reviewRepository;
 
     /**
-     * 후기 전체 검색
+     * 회원별 후기 검색
      * @param userNo
      * @return List<ReviewInfo>
      * @throws BaseException
@@ -28,7 +28,7 @@ public class ReviewProvider {
         try {
             reviewInfoList = reviewRepository.findByWriterAndStatusOrderByCreateDateDesc(userNo, "Y");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER);
+            throw new BaseException(FAILED_TO_GET_REVIEW);
         }
 
         return reviewInfoList;

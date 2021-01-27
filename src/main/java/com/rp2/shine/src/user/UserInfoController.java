@@ -29,7 +29,6 @@ public class UserInfoController {
      */
     @GetMapping("") // (GET) 127.0.0.1:9000/
     public BaseResponse<List<GetUsersRes>> getUsers(@RequestParam(required = false) String word) {
-        System.out.println(word);
         try {
             List<GetUsersRes> getUsersResList = userInfoProvider.retrieveUserInfoList(word);
 
@@ -68,9 +67,9 @@ public class UserInfoController {
 
     /**
      * 회원 상세 조회 API
-     * [GET] /users/:userNo
+     * [GET] /users/:userNo/detail
      * @PathVariable userNo
-     * @return BaseResponse<GetUserRes>
+     * @return BaseResponse<GetDetailRes>
      */
     @ResponseBody
     @GetMapping("/{userNo}/detail")
@@ -98,7 +97,6 @@ public class UserInfoController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<PostUserRes> postUser(@RequestBody @Valid PostUserReq parameters) {
-        // 1. Body Parameter Validation
         if (parameters.getNickname() == null || parameters.getNickname().length() == 0) {
             return new BaseResponse<>(EMPTY_NICKNAME);
         }
@@ -106,7 +104,6 @@ public class UserInfoController {
             return new BaseResponse<>(EMPTY_PHONENUMBER);
         }
 
-        // 2. Post UserInfo
         try {
             PostUserRes postUserRes = userInfoService.createUserInfo(parameters);
             return new BaseResponse<>(SUCCESS_POST_USER, postUserRes);
@@ -144,12 +141,10 @@ public class UserInfoController {
      */
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> login(@RequestBody PostLoginReq parameters) {
-        // 1. Body Parameter Validation
         if (parameters.getPhoneNumber() == null || parameters.getPhoneNumber().length() == 0) {
             return new BaseResponse<>(EMPTY_PHONENUMBER);
         }
 
-        // 2. Login
         try {
             PostLoginRes postLoginRes = userInfoProvider.login(parameters);
             return new BaseResponse<>(SUCCESS_LOGIN, postLoginRes);
