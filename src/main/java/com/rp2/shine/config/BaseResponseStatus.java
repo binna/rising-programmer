@@ -30,7 +30,6 @@ public enum BaseResponseStatus {
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
     EMPTY_USERNO(false, 2001, "회원번호를 확인해주세요."),
     EMPTY_SELLERUSERNO(false, 2002, "판매자를 확인해주세요."),
-    EMPTY_POSTING(false, 2003, "이미 삭제되었거나 존재하지 않는 중고 판매글입니다."),
     EMPTY_POSTINGNO(false, 2004, "게시글 번호를 확인해주세요."),
     EMPTY_JWT(false, 2010, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2011, "유효하지 않은 JWT입니다."),
@@ -43,6 +42,7 @@ public enum BaseResponseStatus {
     EMPTY_PRICE(false, 2080, "금액을 입력해주세요."),
     EMPTY_MANNERSCORE(false, 2090, "매너 점수를 선택해주세요."),
     DO_NOT_MATCH_USERNO(false, 2100, "현재 로그인한 사용자와 작성자가 일치하지 않습니다."),
+    DO_NOT_WRITER(false, 2101, "작성자는 관심등록을 할 수 없습니다."),
 
 
     // 3000 : Response 오류
@@ -66,6 +66,8 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_MANNERSCORE(false, 3024, "매너 점수 조회에 실패하였습니다."),
     FAILED_TO_GET_REVIEW(false, 3025, "후기 검색에 실패하였습니다."),
     FAILED_TO_GET_POSTING(false, 3026, "중고거래 글 조회에 실패하였습니다."),
+    ALREADY_DELETE_CONCERN(false, 3027, "이미 삭제되었거나 존재하지 않는 관심입니다."),
+    ALREADY_DELETE_POSTING(false, 3028, "이미 삭제되었거나 존재하지 않는 중고 판매글입니다."),
 
 
     // 4000 : Database 오류

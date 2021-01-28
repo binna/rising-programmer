@@ -102,7 +102,7 @@ public class UsedTransactionService {
             sellPostingInfo.setCategory(patchUsedReq.getCategory());
             sellPostingInfo.setPrice(patchUsedReq.getPrice());
         } else {    // 이미 삭제한 포스팅
-            throw new BaseException(EMPTY_POSTING);
+            throw new BaseException(ALREADY_DELETE_POSTING);
         }
 
         // 글 포스팅 작성자와 현재 로그인한 사람이 일치해야 함
@@ -152,7 +152,7 @@ public class UsedTransactionService {
 
         // 존재하는 포스팅, 사진확인, 관심확인, 리뷰확인
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
-        List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrievePostingConcernByPostingNo(sellPostingInfo);
+        List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrieveConcernByPostingNo(sellPostingInfo);
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByPostingNo(sellPostingInfo);
 
         // 글 포스팅 작성자와 현재 로그인한 사람이 일치해야 함
@@ -175,7 +175,7 @@ public class UsedTransactionService {
             }
             sellPostingInfo.setStatus("N");
         } else {    // 이미 삭제한 포스팅
-            throw new BaseException(EMPTY_POSTING);
+            throw new BaseException(ALREADY_DELETE_POSTING);
         }
 
         try {
@@ -194,60 +194,80 @@ public class UsedTransactionService {
 
     /**
      * 중고거래 관심 등록
-     * @param potingNo, userNo
+     * @param postingNo, userNo
      * @return PostConcernRes
      * @throws BaseException
      */
     @Transactional
-    public PostConcernRes createConcern(Integer potingNo, Integer userNo) throws BaseException {
-        // TODO JWT 인증
-
-        SellPostingConcernInfo existsConsernInfo = null;
-        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
-        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(potingNo);
-        try {
-            existsConsernInfo = usedTransactionProvider.retrievePostingConcernByPostingNo(usersInfo, sellPostingInfo);
-        } catch (BaseException exception) {
-            if (exception.getStatus() != EMPTY_POSTING) {
-                throw exception;
-            }
+    public PostConcernRes createConcern(Integer postingNo, Integer userNo) throws BaseException {
+        // JWT 인증
+        if(jwtService.getUserNo() != userNo) {
+            throw new BaseException(INVALID_JWT);
         }
 
-        if(existsConsernInfo != null) {
+        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
+        List<SellPostingConcernInfo> existsConcernInfo = usedTransactionProvider.retrieveConcernByConcernUserNoAndPostingNo(usersInfo, sellPostingInfo);
+
+        if(sellPostingInfo.getStatus().equals("N")) {
+            throw new BaseException(ALREADY_DELETE_POSTING);
+        }
+        if(!existsConcernInfo.isEmpty()) {
             throw new BaseException(DUPLICATED_CONCERN);
         }
+        if(sellPostingInfo.getSellerUserNo().getUserNo() == userNo) {
+            throw new BaseException(DO_NOT_WRITER);
+        }
 
-        SellPostingConcernInfo sellPostingConsernInfo = new SellPostingConcernInfo(usersInfo, sellPostingInfo);
+        SellPostingConcernInfo sellPostingConcernInfo = new SellPostingConcernInfo(usersInfo, sellPostingInfo);
         try {
-            postConcernsRepository.save(sellPostingConsernInfo);
+            postConcernsRepository.save(sellPostingConcernInfo);
         } catch (Exception exception) {
             //exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_CONSERN);
         }
 
-        return new PostConcernRes(sellPostingConsernInfo.getPostingNo().getPostingNo(),
-                sellPostingConsernInfo.getConcernUserNo().getUserNo(), sellPostingConsernInfo.getConcernNo());
+        return new PostConcernRes(sellPostingConcernInfo.getPostingNo().getPostingNo(),
+                sellPostingConcernInfo.getConcernUserNo().getUserNo(), sellPostingConcernInfo.getConcernNo());
     }
 
     /**
      * 중고거래 관심 삭제
-     * @param potingNo, userNo
+     * @param postingNo, userNo
      * @throws BaseException
      */
     @Transactional
-    public void deleteConcern(Integer potingNo, Integer userNo) throws BaseException {
-        // TODO JWT 인증
+    public void deleteConcern(Integer postingNo, Integer userNo) throws BaseException {
+        if(jwtService.getUserNo() != userNo) {
+            throw new BaseException(INVALID_JWT);
+        }
 
-        // 1. 존재하는 UserInfo가 있는지 확인 후 저장
         UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
-        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(potingNo);
-        SellPostingConcernInfo sellPostingConsernInfo = usedTransactionProvider.retrievePostingConcernByPostingNo(usersInfo, sellPostingInfo);
+        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
+        List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrieveConcernByConcernUserNoAndPostingNo(usersInfo, sellPostingInfo);
+
+        if(sellPostingInfo.getStatus().equals("N")) {
+            throw new BaseException(ALREADY_DELETE_POSTING);
+        }
+        int cnt = 0;
+        if(sellPostingConcernInfoList.isEmpty()) {
+            throw new BaseException(ALREADY_DELETE_CONCERN);
+        }
+        for(SellPostingConcernInfo concern : sellPostingConcernInfoList) {
+            if(concern.getConcernUserNo().getUserNo().equals(userNo)) {
+                cnt++;
+            }
+        }
+        if(cnt == 0) {
+            throw new BaseException(ALREADY_DELETE_CONCERN);
+        }
 
         try {
-            postConcernsRepository.delete(sellPostingConsernInfo);
+            for(SellPostingConcernInfo concern : sellPostingConcernInfoList) {
+                postConcernsRepository.delete(concern);
+            }
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_CONSERN);
         }
-
     }
 }

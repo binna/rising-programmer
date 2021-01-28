@@ -116,6 +116,7 @@ public class UsedTransactionController {
      * @PathVariable postingNo, userNo
      * @return BaseResponse<PostConcernRes>
      */
+    @ResponseBody
     @PostMapping("/concerns/{postingNo}/{userNo}")
     public BaseResponse<PostConcernRes> postConcern(@PathVariable Integer postingNo, @PathVariable Integer userNo) {
         if(postingNo == null) {
@@ -136,13 +137,13 @@ public class UsedTransactionController {
 
     /**
      * 중고거래 관심 삭제 API
-     * [DELETE] /usedtransactions/concerns/:postringNo/:userNo
+     * [DELETE] /usedtransactions/concerns/:postingNo/:userNo
      * @PathVariable postringNo, userNo
      * @return BaseResponse<Void>
      */
+    @ResponseBody
     @DeleteMapping("/concerns/{postingNo}/{userNo}")
     public BaseResponse<Void> deleteConcern(@PathVariable Integer postingNo, @PathVariable Integer userNo) {
-        // 1. Body Parameter Validation
         if(postingNo == null) {
             return new BaseResponse<>(EMPTY_POSTINGNO);
         }

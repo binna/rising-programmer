@@ -29,8 +29,8 @@ public class UsedTransactionProvider {
 
         try {
             sellPostingInfo = postingInfoRepository.findById(postingNo)
-                    .orElseThrow(() -> new BaseException(EMPTY_POSTING));
-        } catch (Exception ignored) {
+                    .orElseThrow(() -> new BaseException(ALREADY_DELETE_POSTING));
+        } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_POSTING);
         }
 
@@ -49,7 +49,7 @@ public class UsedTransactionProvider {
 
         try {
             sellPostingInfoList = postingInfoRepository.findBySellerUserNoAndStatus(sellerUserNo, "Y");
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_POSTING);
         }
 
@@ -59,11 +59,11 @@ public class UsedTransactionProvider {
     /**
      * 관심 등록 조회
      * @param sellPostingInfo
-     * @return List<SellPostingConsernInfo>
+     * @return List<SellPostingConcernInfo>
      * @throws BaseException
      * @comment postingNo로 관심 등록 조회
      */
-    public List<SellPostingConcernInfo> retrievePostingConcernByPostingNo(SellPostingInfo sellPostingInfo) throws BaseException {
+    public List<SellPostingConcernInfo> retrieveConcernByPostingNo(SellPostingInfo sellPostingInfo) throws BaseException {
         List<SellPostingConcernInfo> sellPostingConsernInfoList;
 
         try {
@@ -77,26 +77,20 @@ public class UsedTransactionProvider {
 
     /**
      * 관심 등록 조회
-     * @param concernUserNo
-     * @return SellPostingConsernInfo
+     * @param concernUserNo, sellPostingInfo
+     * @return List<SellPostingConcernInfo>
      * @throws BaseException
      */
-    public SellPostingConcernInfo retrievePostingConcernByPostingNo(UserInfo concernUserNo, SellPostingInfo sellPostingInfo) throws BaseException {
-        List<SellPostingConcernInfo> existsConsernInfoList;
+    public List<SellPostingConcernInfo> retrieveConcernByConcernUserNoAndPostingNo(UserInfo concernUserNo, SellPostingInfo sellPostingInfo) throws BaseException {
+        List<SellPostingConcernInfo> existsConcernInfoList;
+
         try {
-            existsConsernInfoList = postConcernsRepository.findByConcernUserNoAndPostingNo(concernUserNo, sellPostingInfo);
-        } catch (Exception ignored) {
+            existsConcernInfoList = postConcernsRepository.findByConcernUserNoAndPostingNo(concernUserNo, sellPostingInfo);
+        } catch (Exception exception) {
             throw new BaseException(FAILED_TO_CONSERN);
         }
 
-        SellPostingConcernInfo sellPostingConsernInfo;
-        if (existsConsernInfoList != null && existsConsernInfoList.size() > 0) {
-            sellPostingConsernInfo = existsConsernInfoList.get(0);
-        } else {
-            throw new BaseException(EMPTY_POSTING);
-        }
-
-        return sellPostingConsernInfo;
+        return existsConcernInfoList;
     }
 
 }
