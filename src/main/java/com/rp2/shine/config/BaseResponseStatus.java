@@ -25,11 +25,13 @@ public enum BaseResponseStatus {
     SUCCESS_DELETE_CONCERN(true, 1023, "관심 삭제가 성공되었습니다."),
     SUCCESS_POST_REVIEW(true, 1024, "후기 등록이 성공되었습니다."),
     SUCCESS_DELETE_REVIEW(true, 1025, "후기 등록이 삭제되었습니다."),
+    SUCCESS_SALES_COMPLETED(true, 1026, "중고거래 글의 판매 완료처리가 성공하였습니다."),
 
     // 2000 : Request 오류
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
     EMPTY_USERNO(false, 2001, "회원번호를 확인해주세요."),
     EMPTY_SELLERUSERNO(false, 2002, "판매자를 확인해주세요."),
+    EMPTY_BUYERUSERNO(false, 2003, "구매자를 확인해주세요."),
     EMPTY_POSTINGNO(false, 2004, "게시글 번호를 확인해주세요."),
     EMPTY_JWT(false, 2010, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2011, "유효하지 않은 JWT입니다."),
@@ -43,7 +45,7 @@ public enum BaseResponseStatus {
     EMPTY_MANNERSCORE(false, 2090, "매너 점수를 선택해주세요."),
     DO_NOT_MATCH_USERNO(false, 2100, "현재 로그인한 사용자와 작성자가 일치하지 않습니다."),
     DO_NOT_WRITER(false, 2101, "작성자는 관심등록을 할 수 없습니다."),
-
+    DO_NOT_MATCH_BUYER(false, 2102, "작성자와 구매자는 같을 수 없습니다."),
 
     // 3000 : Response 오류
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
@@ -68,7 +70,8 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_POSTING(false, 3026, "중고거래 글 조회에 실패하였습니다."),
     ALREADY_DELETE_CONCERN(false, 3027, "이미 삭제되었거나 존재하지 않는 관심입니다."),
     ALREADY_DELETE_POSTING(false, 3028, "이미 삭제되었거나 존재하지 않는 중고 판매글입니다."),
-
+    FAILED_SALES_COMPLETED(false, 3029, "중고거래 글의 판매 완료처리가 실패하였습니다."),
+    ALREADY_SALES_COMPLETED(false, 3030, "이미 판매 완료처리된 중고 판매글입니다."),
 
     // 4000 : Database 오류
     SERVER_ERROR(false, 4000, "서버와의 통신에 실패하였습니다."),

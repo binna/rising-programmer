@@ -139,6 +139,44 @@ public class UsedTransactionService {
     }
 
     /**
+     * 중고거래 글 수정
+     * @param postingNo, userNo, buyerNo
+     * @throws BaseException
+     */
+    @Transactional
+    public void patchUsedTransactionSalesCompleted(Integer postingNo, Integer userNo, Integer buyerNo) throws BaseException {
+        if(jwtService.getUserNo() != userNo) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
+        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(buyerNo);
+        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(userNo)) {
+            throw new BaseException(DO_NOT_MATCH_USERNO);
+        }
+        if (sellPostingInfo.getStatus().equals("Y")) {
+            if(userInfo.getUserNo() == sellPostingInfo.getSellerUserNo().getUserNo()) {
+                throw new BaseException(DO_NOT_MATCH_BUYER);
+            } else {
+                sellPostingInfo.setStatus("B");
+                sellPostingInfo.setBuyerUserNo(userInfo);
+            }
+        } else if(sellPostingInfo.getStatus().equals("B")) {
+            throw new BaseException(ALREADY_SALES_COMPLETED);
+        } else if(sellPostingInfo.getStatus().equals("N")) {
+            throw new BaseException(ALREADY_DELETE_POSTING);
+        }
+
+        try {
+           // postingInfoRepository.save(sellPostingInfo);
+        } catch (Exception exception) {
+            //exception.printStackTrace();
+            throw new BaseException(FAILED_TO_PATCH_POSTING);
+        }
+
+    }
+
+    /**
      * 중고거래 글 삭제
      * @param postingNo, userNo
      * @throws BaseException

@@ -6,6 +6,8 @@ import com.rp2.shine.src.usedtransactions.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
@@ -50,7 +52,7 @@ public class UsedTransactionController {
     }
 
     /**
-     * 회원 정보 수정 API
+     * 중고거래 글 수정 API
      * [PATCH] /usedtransactions/:postingNo/:userNo
      * @PathVariable postingNo, userNo
      * @RequestBody PatchUsedTransactionReq
@@ -81,6 +83,36 @@ public class UsedTransactionController {
         try {
             PatchUsedTransactionRes patchUsedStoreRes = usedTransactionsService.updateUsedTransaction(postingNo, userNo, parameters);
             return new BaseResponse<>(SUCCESS_PATCH_POSTING, patchUsedStoreRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 중고거래 글 판매완료 API
+     * [PATCH] /usedtransactions/:buyerNo/:userNo
+     * @PathVariable postingNo, userNo, buyerNo
+     * @RequestBody PatchUsedTransactionReq
+     * @return BaseResponse<PatchUsedTransactionRes>
+     */
+    @ResponseBody
+    @PatchMapping("/SalesCompleted/{postingNo}/{userNo}")
+    public BaseResponse<Void> patchUsedTransactionSalesCompleted(@PathVariable Integer postingNo, @PathVariable Integer userNo, @RequestBody(required = false) HashMap<String, Integer> parameter) {
+        Integer buyerNo = parameter.get("buyerNo");
+
+        if (postingNo == null) {
+            return new BaseResponse<>(EMPTY_POSTINGNO);
+        }
+        if (userNo == null) {
+            return new BaseResponse<>(EMPTY_USERNO);
+        }
+        if (buyerNo == null) {
+            return new BaseResponse<>(EMPTY_BUYERUSERNO);
+        }
+
+        try {
+            usedTransactionsService.patchUsedTransactionSalesCompleted(postingNo, userNo, buyerNo);
+            return new BaseResponse<>(SUCCESS_SALES_COMPLETED);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
