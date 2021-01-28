@@ -4,10 +4,8 @@ import com.rp2.shine.src.common.PhotoReq;
 import lombok.*;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-@Setter
-@ToString
 public class PostUsedTransactionsReq {
     private Integer sellerUserNo;
     private String title;

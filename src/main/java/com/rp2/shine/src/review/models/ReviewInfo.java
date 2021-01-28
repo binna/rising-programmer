@@ -49,9 +49,10 @@ public class ReviewInfo {
     public ReviewInfo(String content, SellPostingInfo sellPostingInfo, String division, String fileName, String filePath) {
         this.content = content;
         this.sellPostingInfo = sellPostingInfo;
-        this.writer = sellPostingInfo.getSellerUserNo().getUserNo();
         this.division = division;
         this.fileName = fileName;
         this.filePath = filePath;
+
+        this.writer = sellPostingInfo.getSellerUserNo().getUserNo();
     }
 }

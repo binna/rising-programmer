@@ -134,7 +134,7 @@ public class UserInfoProvider {
         int sellpostingCnt = usedTransactionsProvider.retrievePostingBySellerUserNoAndStatuY(userInfo).size();
 
         // review
-        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewALL(userNo);
+        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByUserNo(userNo);
         List<GetReviewRes> reviews = new ArrayList<>();
 
         for (ReviewInfo review : reviewInfoList) {

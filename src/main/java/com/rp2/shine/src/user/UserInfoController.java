@@ -121,7 +121,7 @@ public class UserInfoController {
      */
     @ResponseBody
     @PatchMapping("/{userNo}/profile")
-    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userNo, @RequestBody PatchUserReq parameters) {
+    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userNo, @RequestBody @Valid PatchUserReq parameters) {
         if (userNo == null || userNo <= 0) {
             return new BaseResponse<>(EMPTY_USERNO);
         }

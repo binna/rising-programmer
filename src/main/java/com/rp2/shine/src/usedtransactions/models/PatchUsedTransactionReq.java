@@ -5,10 +5,8 @@ import lombok.*;
 
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-@Setter
-@ToString
 public class PatchUsedTransactionReq {
     private String title;
     private String content;

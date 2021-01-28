@@ -23,7 +23,7 @@ public class ReviewProvider {
      * @throws BaseException
      */
     @Transactional
-    public List<ReviewInfo> retrieveReviewALL(Integer userNo) throws BaseException {
+    public List<ReviewInfo> retrieveReviewByUserNo(Integer userNo) throws BaseException {
         List<ReviewInfo> reviewInfoList;
 
         try {
@@ -54,4 +54,45 @@ public class ReviewProvider {
 
         return reviewInfoList;
     }
+
+    /**
+     * 중고거래별 판매 후기 조회
+     * @param sellPostingInfo
+     * @return List<ReviewInfo>
+     * @throws BaseException
+     * @comment SellPostingInfo로 후기 조회
+     */
+    @Transactional
+    public List<ReviewInfo> retrieveSellerReviewByPostingNoAndDivisionS(SellPostingInfo sellPostingInfo) throws BaseException {
+        List<ReviewInfo> reviewInfoList;
+
+        try {
+            reviewInfoList = reviewRepository.findBySellPostingInfoAndDivision(sellPostingInfo, "S");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_REVIEW);
+        }
+
+        return reviewInfoList;
+    }
+
+    /**
+     * 중고거래별 구매 후기 조회
+     * @param sellPostingInfo
+     * @return List<ReviewInfo>
+     * @throws BaseException
+     * @comment SellPostingInfo로 후기 조회
+     */
+    @Transactional
+    public List<ReviewInfo> retrieveBuyerReviewByPostingNoAndDivisionB(SellPostingInfo sellPostingInfo) throws BaseException {
+        List<ReviewInfo> reviewInfoList;
+
+        try {
+            reviewInfoList = reviewRepository.findBySellPostingInfoAndDivision(sellPostingInfo, "B");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_REVIEW);
+        }
+
+        return reviewInfoList;
+    }
+
 }
