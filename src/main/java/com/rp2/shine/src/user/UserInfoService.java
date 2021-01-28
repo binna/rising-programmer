@@ -4,6 +4,7 @@ import com.rp2.shine.src.user.models.UserInfo;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.user.models.*;
+import com.rp2.shine.utils.ValidationRegex;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class UserInfoService {
     private final UserInfoRepository userInfoRepository;
     private final UserInfoProvider userInfoProvider;
     private final JwtService jwtService;
+    private final ValidationRegex validationRegex;
 
     /**
      * 회원가입
@@ -84,9 +86,14 @@ public class UserInfoService {
             userInfo.setProfilePath(patchUserReq.getProfilePath());
             userInfo.setProfileName(patchUserReq.getProfileName());
         } else if(patchUserReq.getEmail() != null && !patchUserReq.getEmail().isEmpty()) {
+            if(!validationRegex.isRegexEmail(patchUserReq.getEmail())) {
+                throw new BaseException(INVALID_EMAIL);
+            }
             userInfo.setEmail(patchUserReq.getEmail());
         } else if(patchUserReq.getPhoneNumber() != null && !patchUserReq.getPhoneNumber().isEmpty()) {
-            if(!userInfoRepository.findByPhoneNumber(patchUserReq.getPhoneNumber()).isEmpty()){
+            if(!validationRegex.isRegexPhoneNumber(patchUserReq.getPhoneNumber())) {
+                throw new BaseException(INVALID_PHONENUMBER);
+            } else if(!userInfoRepository.findByPhoneNumber(patchUserReq.getPhoneNumber()).isEmpty()){
                 throw new BaseException(DUPLICATED_USER);
             }
             userInfo.setPhoneNumber(patchUserReq.getPhoneNumber());
