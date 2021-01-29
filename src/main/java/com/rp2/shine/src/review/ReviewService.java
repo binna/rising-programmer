@@ -8,13 +8,12 @@ import com.rp2.shine.src.usedtransactions.UsedTransactionProvider;
 import com.rp2.shine.src.usedtransactions.models.SellPostingInfo;
 import com.rp2.shine.src.user.MannerScoreRepository;
 import com.rp2.shine.src.user.models.MannerScoreInfo;
-import com.rp2.shine.src.user.models.PostUserReq;
-import com.rp2.shine.src.user.models.PostUserRes;
-import com.rp2.shine.src.user.models.UserInfo;
 import com.rp2.shine.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.rp2.shine.config.BaseResponseStatus.*;
 
@@ -55,7 +54,7 @@ public class ReviewService {
         
         // 이미 존재하는 후기
         if(!reviewProvider.retrieveSellerReviewByPostingNoAndDivisionS(sellPostingInfo).isEmpty()) {
-            throw new BaseException(ALREADY_REVIEW);
+            throw new BaseException(ALREADY_POST_REVIEW);
         }
 
         try {
@@ -99,7 +98,7 @@ public class ReviewService {
 
         // 이미 존재하는 후기
         if(!reviewProvider.retrieveBuyerReviewByPostingNoAndDivisionB(sellPostingInfo).isEmpty()) {
-            throw new BaseException(ALREADY_REVIEW);
+            throw new BaseException(ALREADY_POST_REVIEW);
         }
 
         try {
@@ -113,5 +112,73 @@ public class ReviewService {
         return new PostReviewRes(reviewInfo.getDivision(), reviewInfo.getReviewNo(), reviewInfo.getWriter(),
                 reviewInfo.getContent(), reviewInfo.getStatus(), reviewInfo.getCreateDate(),
                 reviewInfo.getFilePath(), reviewInfo.getFilePath(), mannerScoreInfo.getTakeManner(), mannerScoreInfo.getUserNo().getUserNo());
+    }
+
+    /**
+     * 판매 후기 삭제
+     * @param userNo, postingNo
+     * @throws BaseException
+     */
+    @Transactional
+    public void deleteSellerReview(Integer userNo, Integer postingNo) throws BaseException {
+        if(jwtService.getUserNo() != userNo) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
+        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveSellerReviewByPostingNoAndDivisionS(sellPostingInfo);
+
+
+        // 이미 삭제되었나 없는 후기
+        if(reviewInfoList.isEmpty()) {
+            throw new BaseException(ALREADY_DELETE_REVIEW);
+        }
+        
+        // 판매자와 일치하지 않는 후기
+        if(sellPostingInfo.getSellerUserNo().getUserNo() != userNo) {
+            throw new BaseException(DO_NOT_MATCH_USERNO);
+        }
+
+        try {
+            for(ReviewInfo review : reviewInfoList) {
+                reviewRepository.delete(review);
+            }
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_DELETE_REVIEW);
+        }
+    }
+
+    /**
+     * 판매 후기 삭제
+     * @param userNo, postingNo
+     * @throws BaseException
+     */
+    @Transactional
+    public void deleteBuyerReview(Integer userNo, Integer postingNo) throws BaseException {
+        if(jwtService.getUserNo() != userNo) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
+        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveBuyerReviewByPostingNoAndDivisionB(sellPostingInfo);
+
+
+        // 이미 삭제되었나 없는 후기
+        if(reviewInfoList.isEmpty()) {
+            throw new BaseException(ALREADY_DELETE_REVIEW);
+        }
+
+        // 구매자와 일치하지 않는 후기
+        if(sellPostingInfo.getBuyerUserNo().getUserNo() != userNo) {
+            throw new BaseException(DO_NOT_MATCH_USERNO);
+        }
+
+        try {
+            for(ReviewInfo review : reviewInfoList) {
+                reviewRepository.delete(review);
+            }
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_DELETE_REVIEW);
+        }
     }
 }

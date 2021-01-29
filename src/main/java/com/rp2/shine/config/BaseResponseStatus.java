@@ -26,6 +26,7 @@ public enum BaseResponseStatus {
     SUCCESS_POST_REVIEW(true, 1024, "후기 등록이 성공되었습니다."),
     SUCCESS_DELETE_REVIEW(true, 1025, "후기 등록이 삭제되었습니다."),
     SUCCESS_SALES_COMPLETED(true, 1026, "중고거래 글의 판매 완료처리가 성공하였습니다."),
+    SUCCESS_GET_REVIEW(true, 1027, "후기 조회가 성공하였습니다."),
 
     // 2000 : Request 오류
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
@@ -36,7 +37,8 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2010, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2011, "유효하지 않은 JWT입니다."),
     EMPTY_NICKNAME(false, 2020, "닉네임을 입력해주세요."),
-    EMPTY_PHONENUMBER(false, 2030, "휴대전화번호를 입력해주세요."),
+    EMPTY_PHONENUMBER(false, 2030, "휴대폰 번호를 입력해주세요."),
+    INVALID_PHONENUMBER(false, 2031, "휴대폰 형식을 확인해주세요."),
     EMPTY_WITHDRAWAL_REASON(false, 2040, "탈퇴 이유를 입력해주세요."),
     EMPTY_TITLE(false, 2050, "제목을 입력해주세요."),
     EMPTY_CONTENT(false, 2060, "내용을 입력해주세요."),
@@ -47,6 +49,7 @@ public enum BaseResponseStatus {
     DO_NOT_WRITER(false, 2101, "작성자는 관심등록을 할 수 없습니다."),
     DO_NOT_MATCH_BUYER(false, 2102, "작성자와 구매자는 같을 수 없습니다."),
     DO_NOT_SALES_COMPLETED(false, 2103, "아직 판매가 완료되지 않았습니다."),
+    INVALID_EMAIL(false, 2103, "이메일 형식을 확인해주세요."),
 
     // 3000 : Response 오류
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
@@ -73,7 +76,8 @@ public enum BaseResponseStatus {
     ALREADY_DELETE_POSTING(false, 3028, "이미 삭제되었거나 존재하지 않는 중고 판매글입니다."),
     FAILED_SALES_COMPLETED(false, 3029, "중고거래 글의 판매 완료처리가 실패하였습니다."),
     ALREADY_SALES_COMPLETED(false, 3030, "이미 판매 완료처리된 중고 판매글입니다."),
-    ALREADY_REVIEW(false, 3031, "이미 후기를 작성하셨습니다."),
+    ALREADY_POST_REVIEW(false, 3031, "이미 후기를 작성하셨습니다."),
+    ALREADY_DELETE_REVIEW(false, 3032, "이미 삭제되었거나 없는 후기입니다.."),
 
     // 4000 : Database 오류
     SERVER_ERROR(false, 4000, "서버와의 통신에 실패하였습니다."),

@@ -9,8 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewInfo, Integer> {
-    List<ReviewInfo> findBySellPostingInfoAndWriterAndDivisionAndStatus(SellPostingInfo sellPostingInfo, Integer writer, String division, String status);
     List<ReviewInfo> findByWriterAndStatusOrderByCreateDateDesc(Integer writer, String status);
+    List<ReviewInfo> findByWriterAndStatusAndDivisionOrderByCreateDateDesc(Integer writer, String status, String division);
     List<ReviewInfo> findBySellPostingInfo(SellPostingInfo sellPostingInfo);
     List<ReviewInfo> findBySellPostingInfoAndDivision(SellPostingInfo sellPostingInfo, String division);
 }

@@ -4,10 +4,10 @@ import com.rp2.shine.config.BaseException;
 import com.rp2.shine.config.BaseResponse;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.src.user.models.*;
+import com.rp2.shine.utils.ValidationRegex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.*;
 import java.util.List;
 
 import static com.rp2.shine.config.BaseResponseStatus.*;
@@ -19,6 +19,7 @@ public class UserInfoController {
     private final UserInfoProvider userInfoProvider;
     private final UserInfoService userInfoService;
     private final JwtService jwtService;
+    private final ValidationRegex validationRegex;
 
     /**
      * 회원 전체 조회 API
@@ -96,12 +97,15 @@ public class UserInfoController {
     // Json 같은 건 생성자만 있어도 되는데, 폼데이터의 경우엔 @Setter가 있어야 받아올 수 있음!
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostUserRes> postUser(@RequestBody @Valid PostUserReq parameters) {
+    public BaseResponse<PostUserRes> postUser(@RequestBody PostUserReq parameters) {
         if (parameters.getNickname() == null || parameters.getNickname().length() == 0) {
             return new BaseResponse<>(EMPTY_NICKNAME);
         }
         if (parameters.getPhoneNumber() == null || parameters.getPhoneNumber().length() == 0) {
             return new BaseResponse<>(EMPTY_PHONENUMBER);
+        }
+        if(!validationRegex.isRegexPhoneNumber(parameters.getPhoneNumber())) {
+            return new BaseResponse<>(INVALID_PHONENUMBER);
         }
 
         try {
@@ -121,7 +125,7 @@ public class UserInfoController {
      */
     @ResponseBody
     @PatchMapping("/{userNo}/profile")
-    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userNo, @RequestBody @Valid PatchUserReq parameters) {
+    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userNo, @RequestBody PatchUserReq parameters) {
         if (userNo == null || userNo <= 0) {
             return new BaseResponse<>(EMPTY_USERNO);
         }
