@@ -26,6 +26,7 @@ public enum BaseResponseStatus {
     SUCCESS_POST_REVIEW(true, 1024, "후기 등록이 성공되었습니다."),
     SUCCESS_DELETE_REVIEW(true, 1025, "후기 등록이 삭제되었습니다."),
     SUCCESS_SALES_COMPLETED(true, 1026, "중고거래 글의 판매 완료처리가 성공하였습니다."),
+    SUCCESS_GET_REVIEW(true, 1027, "후기 조회가 성공하였습니다."),
 
     // 2000 : Request 오류
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
@@ -75,7 +76,8 @@ public enum BaseResponseStatus {
     ALREADY_DELETE_POSTING(false, 3028, "이미 삭제되었거나 존재하지 않는 중고 판매글입니다."),
     FAILED_SALES_COMPLETED(false, 3029, "중고거래 글의 판매 완료처리가 실패하였습니다."),
     ALREADY_SALES_COMPLETED(false, 3030, "이미 판매 완료처리된 중고 판매글입니다."),
-    ALREADY_REVIEW(false, 3031, "이미 후기를 작성하셨습니다."),
+    ALREADY_POST_REVIEW(false, 3031, "이미 후기를 작성하셨습니다."),
+    ALREADY_DELETE_REVIEW(false, 3032, "이미 삭제되었거나 없는 후기입니다.."),
 
     // 4000 : Database 오류
     SERVER_ERROR(false, 4000, "서버와의 통신에 실패하였습니다."),
