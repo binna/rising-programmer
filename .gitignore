@@ -70,3 +70,7 @@ src/main/resources/application.yml
 *secret/Secret.java
 */Secret*
 *Secret*
+
+## 테스트 폴더 전체
+/test/*
+*/test/*
