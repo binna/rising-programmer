@@ -72,4 +72,4 @@ src/main/resources/application.yml
 *Secret*
 
 ## 테스트 폴더 전체
-/test/*
+/test/java/*
