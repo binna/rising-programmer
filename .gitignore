@@ -73,3 +73,4 @@ src/main/resources/application.yml
 
 ## 테스트 폴더 전체
 /test/java/*
+*/src/test/java/*
