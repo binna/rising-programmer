@@ -166,7 +166,7 @@ public class UsedTransactionController {
     /**
      * 판매자 후기 등록 API
      * [POST] /used-transactions/:postingNo/reviews/seller
-     * @PathVariable userNo, postingNo
+     * @PathVariable postingNo
      * @RequestBody PostReviewReq
      * @return BaseResponse<PostReviewRes>
      */
@@ -191,7 +191,7 @@ public class UsedTransactionController {
 
     /** 구매자 후기 등록 API
      * [POST] /used-transactions/:postingNo/reviews/buyer
-     * @PathVariable userNo, postingNo
+     * @PathVariable postingNo
      * @RequestBody PostReviewReq
      * @return BaseResponse<PostReviewRes>
      */

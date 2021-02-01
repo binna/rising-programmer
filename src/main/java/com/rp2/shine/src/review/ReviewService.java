@@ -80,7 +80,7 @@ public class ReviewService {
 
         // 구매자와 로그인 일치여부 확인
         if(jwtService.getUserNo() != sellPostingInfo.getBuyerUserNo().getUserNo()) {
-            throw new BaseException(DO_NOT_MATCH_USERNO);
+            throw new BaseException(DO_NOT_MATCH_BUYER);
         }
 
         // 판매완료 상태인지 확인
