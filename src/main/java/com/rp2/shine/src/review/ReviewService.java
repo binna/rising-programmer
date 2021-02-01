@@ -76,7 +76,7 @@ public class ReviewService {
     public PostReviewRes createBuyerReviewInfo(Integer postingNo, PostReviewReq parameters) throws BaseException {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         ReviewInfo reviewInfo = new ReviewInfo(parameters.getContent(), sellPostingInfo, "B", parameters.getFileName(),parameters.getFilePath());
-        MannerScoreInfo mannerScoreInfo = new MannerScoreInfo(sellPostingInfo.getSellerUserNo(), parameters.getTakeManner());
+        MannerScoreInfo mannerScoreInfo = new MannerScoreInfo(sellPostingInfo.getBuyerUserNo(), parameters.getTakeManner());
 
         // 구매자와 로그인 일치여부 확인
         if(jwtService.getUserNo() != sellPostingInfo.getBuyerUserNo().getUserNo()) {
