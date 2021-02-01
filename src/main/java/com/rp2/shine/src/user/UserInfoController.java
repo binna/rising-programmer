@@ -73,14 +73,10 @@ public class UserInfoController {
      * @return BaseResponse<GetDetailRes>
      */
     @ResponseBody
-    @GetMapping("/{userNo}/detail")
-    public BaseResponse<GetDetailRes> getDetailUser(@PathVariable Integer userNo) {
-        if (userNo == null || userNo <= 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
-
+    @GetMapping("/detail")
+    public BaseResponse<GetDetailRes> getDetailUser() {
         try {
-            GetDetailRes getDetailRes = userInfoProvider.retrieveDetailUserInfo(userNo);
+            GetDetailRes getDetailRes = userInfoProvider.retrieveDetailUserInfo();
             return new BaseResponse<>(SUCCESS_READ_USER, getDetailRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -124,14 +120,10 @@ public class UserInfoController {
      * @return BaseResponse<PatchUserRes>
      */
     @ResponseBody
-    @PatchMapping("/{userNo}/profile")
-    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userNo, @RequestBody PatchUserReq parameters) {
-        if (userNo == null || userNo <= 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
-
+    @PatchMapping("/profile")
+    public BaseResponse<PatchUserRes> patchUser(@RequestBody PatchUserReq parameters) {
         try {
-            return new BaseResponse<>(SUCCESS_PATCH_USER, userInfoService.updateUserInfo(userNo, parameters));
+            return new BaseResponse<>(SUCCESS_PATCH_USER, userInfoService.updateUserInfo(parameters));
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
