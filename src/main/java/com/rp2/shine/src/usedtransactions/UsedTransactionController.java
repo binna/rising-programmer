@@ -87,13 +87,13 @@ public class UsedTransactionController {
 
     /**
      * 중고거래 글 판매완료 API
-     * [PATCH] /used-transactions/:postingNo
+     * [PATCH] /used-transactions/:postingNo/sales-completed
      * @PathVariable postingNo
      * @RequestBody buyerNo
      * @return BaseResponse<PatchUsedTransactionRes>
      */
     @ResponseBody
-    @PatchMapping("/{postingNo}")
+    @PatchMapping("/{postingNo}/sales-completed")
     public BaseResponse<Void> patchUsedTransactionSalesCompleted(@PathVariable Integer postingNo, @RequestBody(required = false) HashMap<String, Integer> parameter) {
         Integer buyerNo = parameter.get("buyerNo");
 
