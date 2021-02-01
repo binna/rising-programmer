@@ -5,7 +5,6 @@ import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.src.user.models.*;
 import com.rp2.shine.utils.ValidationRegex;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,14 +70,9 @@ public class UserInfoService {
      * @throws BaseException
      */
     @Transactional
-    public PatchUserRes updateUserInfo(@NonNull Integer userNo, PatchUserReq patchUserReq) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public PatchUserRes updateUserInfo(PatchUserReq patchUserReq) throws BaseException {
         // 존재하는 UserInfo가 있는지 확인 후 저장
-        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(jwtService.getUserNo());
 
         // 해당 UserInfo의 nickname, profilePhoto or email or phoneNumber 사용자가 입력한 값으로 설정
         if(patchUserReq.getNickname() != null && !patchUserReq.getNickname().isEmpty()) {
@@ -104,7 +98,7 @@ public class UserInfoService {
         try {
             userInfoRepository.save(userInfo);
 
-            return new PatchUserRes(userNo, userInfo.getNickname(), userInfo.getProfilePath(),
+            return new PatchUserRes(userInfo.getUserNo(), userInfo.getNickname(), userInfo.getProfilePath(),
                     userInfo.getProfileName(), userInfo.getEmail(), userInfo.getPhoneNumber());
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_PATCH_USER);

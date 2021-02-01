@@ -69,20 +69,14 @@ public class UserInfoProvider {
 
     /**
      * 회원 조회
-     * @param userNo
      * @return GetDetailRes
      * @throws BaseException
      * @comment 디테일한 회원정보 -> 프로필 정보
      */
     @Transactional
-    public GetDetailRes retrieveDetailUserInfo(Integer userNo) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public GetDetailRes retrieveDetailUserInfo() throws BaseException {
         // 회원 기본 정보 노출
-        UserInfo userInfo = retrieveUserInfoByUserNO(userNo);
+        UserInfo userInfo = retrieveUserInfoByUserNO(jwtService.getUserNo());
 
         // 매너 온도, 매너 평가 노출
         List<MannerScoreInfo> mannerScoreInfoList = retrieveMannerScoreInfoByUserNo(userInfo);
@@ -134,7 +128,7 @@ public class UserInfoProvider {
         int sellpostingCnt = usedTransactionsProvider.retrievePostingBySellerUserNoAndStatuY(userInfo).size();
 
         // review
-        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByUserNo(userNo);
+        List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByUserNo(userInfo.getUserNo());
         List<GetReviewRes> reviews = new ArrayList<>();
 
         for (ReviewInfo review : reviewInfoList) {
