@@ -41,20 +41,15 @@ public class ReviewProvider {
 
     /**
      * 회원별 후기 검색 -> review 노출용
-     * @param userNo
      * @return List<ReviewInfo>
      * @throws BaseException
      */
     @Transactional
-    public List<GetReviewRes> retrieveReviewByUserNoReturnGetReviewRes(Integer userNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public List<GetReviewRes> retrieveReviewByUserNoReturnGetReviewRes() throws BaseException {
         List<ReviewInfo> reviewInfoList;
 
         try {
-            reviewInfoList = reviewRepository.findByWriterAndStatusOrderByCreateDateDesc(userNo, "Y");
+            reviewInfoList = reviewRepository.findByWriterAndStatusOrderByCreateDateDesc(jwtService.getUserNo(), "Y");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_REVIEW);
         }
@@ -69,20 +64,15 @@ public class ReviewProvider {
 
     /**
      * 회원별 판매 후기 검색 -> review 노출용
-     * @param userNo
      * @return List<ReviewInfo>
      * @throws BaseException
      */
     @Transactional
-    public List<GetReviewRes> retrieveSellerReviewByUserNoReturnGetReviewRes(Integer userNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public List<GetReviewRes> retrieveSellerReviewByUserNoReturnGetReviewRes() throws BaseException {
         List<ReviewInfo> reviewInfoList;
 
         try {
-            reviewInfoList = reviewRepository.findByWriterAndStatusAndDivisionOrderByCreateDateDesc(userNo, "Y", "S");
+            reviewInfoList = reviewRepository.findByWriterAndStatusAndDivisionOrderByCreateDateDesc(jwtService.getUserNo(), "Y", "S");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_REVIEW);
         }
@@ -97,20 +87,15 @@ public class ReviewProvider {
 
     /**
      * 회원별 구매 후기 검색 -> review 노출용
-     * @param userNo
      * @return List<ReviewInfo>
      * @throws BaseException
      */
     @Transactional
-    public List<GetReviewRes> retrieveBuyerReviewByUserNoReturnGetReviewRes(Integer userNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public List<GetReviewRes> retrieveBuyerReviewByUserNoReturnGetReviewRes() throws BaseException {
         List<ReviewInfo> reviewInfoList;
 
         try {
-            reviewInfoList = reviewRepository.findByWriterAndStatusAndDivisionOrderByCreateDateDesc(userNo, "Y", "B");
+            reviewInfoList = reviewRepository.findByWriterAndStatusAndDivisionOrderByCreateDateDesc(jwtService.getUserNo(), "Y", "B");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_REVIEW);
         }

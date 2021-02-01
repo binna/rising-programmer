@@ -3,8 +3,6 @@ package com.rp2.shine.src.review;
 import com.rp2.shine.config.BaseException;
 import com.rp2.shine.config.BaseResponse;
 import com.rp2.shine.src.review.models.GetReviewRes;
-import com.rp2.shine.src.review.models.PostReviewReq;
-import com.rp2.shine.src.review.models.PostReviewRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,18 +14,17 @@ import static com.rp2.shine.config.BaseResponseStatus.*;
 @RestController
 @RequestMapping("/reviews")
 public class ReviewController {
-    private final ReviewService reviewService;
     private final ReviewProvider reviewProvider;
 
     /**
      * 회원별 후기 전체 조회 API
-     * [GET] /reviews/all/:userNo
+     * [GET] /reviews
      * @return BaseResponse<List<GetUsersRes>>
      */
-    @GetMapping("/all/{userNo}")
-    public BaseResponse<List<GetReviewRes>> getReview(@PathVariable Integer userNo) {
+    @GetMapping("")
+    public BaseResponse<List<GetReviewRes>> getReview() {
         try {
-            List<GetReviewRes> getReviewResList = reviewProvider.retrieveReviewByUserNoReturnGetReviewRes(userNo);
+            List<GetReviewRes> getReviewResList = reviewProvider.retrieveReviewByUserNoReturnGetReviewRes();
             return new BaseResponse<>(SUCCESS_GET_REVIEW, getReviewResList);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -36,13 +33,13 @@ public class ReviewController {
 
     /**
      * 회원별 판매 후기 조회 API
-     * [GET] /reviews/seller/:userNo
+     * [GET] /reviews/seller
      * @return BaseResponse<List<GetUsersRes>>
      */
-    @GetMapping("/seller/{userNo}")
-    public BaseResponse<List<GetReviewRes>> getSellerReview(@PathVariable Integer userNo) {
+    @GetMapping("/seller")
+    public BaseResponse<List<GetReviewRes>> getSellerReview() {
         try {
-            List<GetReviewRes> getReviewResList = reviewProvider.retrieveSellerReviewByUserNoReturnGetReviewRes(userNo);
+            List<GetReviewRes> getReviewResList = reviewProvider.retrieveSellerReviewByUserNoReturnGetReviewRes();
             return new BaseResponse<>(SUCCESS_GET_REVIEW, getReviewResList);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -51,86 +48,16 @@ public class ReviewController {
 
     /**
      * 회원별 구매 후기 조회 API
-     * [GET] /reviews/buyer/:userNo
+     * [GET] /reviews/buyer
      * @return BaseResponse<List<GetUsersRes>>
      */
-    @GetMapping("/buyer/{userNo}")
-    public BaseResponse<List<GetReviewRes>> getBuyerReview(@PathVariable Integer userNo) {
+    @GetMapping("/buyer")
+    public BaseResponse<List<GetReviewRes>> getBuyerReview() {
         try {
-            List<GetReviewRes> getReviewResList = reviewProvider.retrieveBuyerReviewByUserNoReturnGetReviewRes(userNo);
+            List<GetReviewRes> getReviewResList = reviewProvider.retrieveBuyerReviewByUserNoReturnGetReviewRes();
             return new BaseResponse<>(SUCCESS_GET_REVIEW, getReviewResList);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
-/*
-    @ResponseBody
-    @PostMapping("/seller/{userNo}/post/{postingNo}")
-    public BaseResponse<PostReviewRes> postSellerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo, @RequestBody(required = false) PostReviewReq parameters) {
-        if(parameters.getContent() == null || parameters.getContent().length() == 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
-        if (parameters.getTakeManner() == null) {
-            return new BaseResponse<>(EMPTY_MANNERSCORE);
-        }
-
-        try {
-            PostReviewRes postReviewRes = reviewService.createSellerReviewInfo(userNo, postingNo, parameters);
-            return new BaseResponse<>(SUCCESS_POST_REVIEW, postReviewRes);
-        } catch (BaseException exception) {
-            //exception.printStackTrace();
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-
-     @ResponseBody
-     @PostMapping("/buyer/{userNo}/post/{postingNo}")
-     public BaseResponse<PostReviewRes> postBuyerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo, @RequestBody(required = false) PostReviewReq parameters) {
-         if(parameters.getContent() == null || parameters.getContent().length() == 0) {
-             return new BaseResponse<>(EMPTY_USERNO);
-         }
-         if (parameters.getTakeManner() == null) {
-             return new BaseResponse<>(EMPTY_MANNERSCORE);
-         }
-
-         try {
-             PostReviewRes postReviewRes = reviewService.createBuyerReviewInfo(userNo, postingNo, parameters);
-             return new BaseResponse<>(SUCCESS_POST_REVIEW, postReviewRes);
-         } catch (BaseException exception) {
-             //exception.printStackTrace();
-             return new BaseResponse<>(exception.getStatus());
-         }
-     }
-
-
-    @DeleteMapping("/seller/{userNo}/delete/{postingNo}")
-    public BaseResponse<Void> deleteSellerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo) {
-        if (userNo == null || userNo <= 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
-
-        try {
-            reviewService.deleteSellerReview(userNo, postingNo);
-            return new BaseResponse<>(SUCCESS_DELETE_REVIEW);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-
-    @DeleteMapping("/buyer/{userNo}/delete/{postingNo}")
-    public BaseResponse<Void> deleteBuyerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo) {
-        if (userNo == null || userNo <= 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
-
-        try {
-            reviewService.deleteBuyerReview(userNo, postingNo);
-            return new BaseResponse<>(SUCCESS_DELETE_REVIEW);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }*/
 }
