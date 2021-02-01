@@ -223,35 +223,36 @@ public class UsedTransactionService {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         List<SellPostingConcernInfo> existsConcernInfo = usedTransactionProvider.retrieveConcernByConcernUserNoAndPostingNo(usersInfo, sellPostingInfo);
 
-        if(sellPostingInfo.getStatus().equals("N")) {
+        if (sellPostingInfo.getStatus().equals("N")) {
             throw new BaseException(ALREADY_DELETE_POSTING);
         }
 
-        if(sellPostingInfo.getSellerUserNo().getUserNo() == jwtService.getUserNo()) {
+        if (sellPostingInfo.getSellerUserNo().getUserNo() == jwtService.getUserNo()) {
             throw new BaseException(DO_NOT_WRITER);
         }
 
         // 관심 존재하면 삭제
-        if(!existsConcernInfo.isEmpty()) {
+        if (!existsConcernInfo.isEmpty()) {
             try {
-                for(SellPostingConcernInfo concern : existsConcernInfo) {
+                for (SellPostingConcernInfo concern : existsConcernInfo) {
                     postConcernsRepository.delete(concern);
                 }
             } catch (Exception exception) {
                 throw new BaseException(FAILED_TO_DELETE_CONSERN);
             }
-        }
+            return null;
+        } else {
+            // 관심 존재하지 않는다면 생성
+            SellPostingConcernInfo sellPostingConcernInfo = new SellPostingConcernInfo(usersInfo, sellPostingInfo);
+            try {
+                postConcernsRepository.save(sellPostingConcernInfo);
+            } catch (Exception exception) {
+                //exception.printStackTrace();
+                throw new BaseException(FAILED_TO_POST_CONSERN);
+            }
 
-        // 관심 존재하지 않는다면 생성
-        SellPostingConcernInfo sellPostingConcernInfo = new SellPostingConcernInfo(usersInfo, sellPostingInfo);
-        try {
-            postConcernsRepository.save(sellPostingConcernInfo);
-        } catch (Exception exception) {
-            //exception.printStackTrace();
-            throw new BaseException(FAILED_TO_POST_CONSERN);
+            return new PostConcernRes(sellPostingConcernInfo.getPostingNo().getPostingNo(),
+                    sellPostingConcernInfo.getConcernUserNo().getUserNo(), sellPostingConcernInfo.getConcernNo());
         }
-
-        return new PostConcernRes(sellPostingConcernInfo.getPostingNo().getPostingNo(),
-                sellPostingConcernInfo.getConcernUserNo().getUserNo(), sellPostingConcernInfo.getConcernNo());
     }
 }
