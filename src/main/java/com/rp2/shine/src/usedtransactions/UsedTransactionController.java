@@ -110,22 +110,19 @@ public class UsedTransactionController {
 
     /**
      * 중고거래 글 삭제 API
-     * [DELETE] /usedtransactions/:postingNo/:userNo
-     * @PathVariable postingNo, userNo
+     * [DELETE] /used-transactions/:postingNo
+     * @PathVariable postingNo
      * @return BaseResponse<Void>
      */
     @ResponseBody
     @DeleteMapping("/{postingNo}/{userNo}")
-    public BaseResponse<Void> deleteUsedTransaction(@PathVariable Integer postingNo, @PathVariable Integer userNo) {
+    public BaseResponse<Void> deleteUsedTransaction(@PathVariable Integer postingNo) {
         if (postingNo == null) {
             return new BaseResponse<>(EMPTY_SELLERUSERNO);
         }
-        if (userNo == null) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
 
         try {
-            usedTransactionsService.deleteUsedTransaction(postingNo, userNo);
+            usedTransactionsService.deleteUsedTransaction(postingNo);
             return new BaseResponse<>(SUCCESS_DELETE_POSTING);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

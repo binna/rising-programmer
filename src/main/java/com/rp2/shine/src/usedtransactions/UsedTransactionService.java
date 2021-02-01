@@ -164,23 +164,18 @@ public class UsedTransactionService {
 
     /**
      * 중고거래 글 삭제
-     * @param postingNo, userNo
+     * @param postingNo
      * @throws BaseException
      */
     @Transactional
-    public void deleteUsedTransaction(Integer postingNo, Integer userNo) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public void deleteUsedTransaction(Integer postingNo) throws BaseException {
         // 존재하는 포스팅, 사진확인, 관심확인, 리뷰확인
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrieveConcernByPostingNo(sellPostingInfo);
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByPostingNo(sellPostingInfo);
 
         // 글 포스팅 작성자와 현재 로그인한 사람이 일치해야 함
-        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(userNo)) {
+        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(jwtService.getUserNo())) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
@@ -217,7 +212,7 @@ public class UsedTransactionService {
     }
 
     /**
-     * 중고거래 관심 등록
+     * 중고거래 관심 등록, 삭제
      * @param postingNo
      * @return PostConcernRes
      * @throws BaseException
