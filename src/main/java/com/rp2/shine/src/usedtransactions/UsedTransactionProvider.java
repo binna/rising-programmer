@@ -92,5 +92,4 @@ public class UsedTransactionProvider {
 
         return existsConcernInfoList;
     }
-
 }

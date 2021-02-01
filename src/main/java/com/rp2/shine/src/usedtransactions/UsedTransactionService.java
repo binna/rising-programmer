@@ -35,19 +35,14 @@ public class UsedTransactionService {
 
     /**
      * 중고거래 글 생성
-     * @param userNo, parameters
+     * @param parameters
      * @return PostUsedTransactionsRes
      * @throws BaseException
      */
     @Transactional
-    public PostUsedTransactionsRes createUsedTransactions(Integer userNo, PostUsedTransactionsReq parameters) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public PostUsedTransactionsRes createUsedTransactions(PostUsedTransactionsReq parameters) throws BaseException {
         // 중고거래 글 생성
-        UserInfo userInfo = userInfoRepository.findById(userNo).orElseThrow(() -> new BaseException(FAILED_TO_GET_USER));
+        UserInfo userInfo = userInfoRepository.findById(jwtService.getUserNo()).orElseThrow(() -> new BaseException(FAILED_TO_GET_USER));
         List<SellPostingPhotoInfo> sellPostingPhotoInfoList = new ArrayList<>();
         if(parameters.getPostingPhoto() != null) {
             for (PhotoReq photo : parameters.getPostingPhoto()) {
@@ -83,17 +78,12 @@ public class UsedTransactionService {
 
     /**
      * 중고거래 글 수정
-     * @param postingNo, userNo, patchUsedReq
+     * @param postingNo, patchUsedReq
      * @return PatchUsedTransactionRes
      * @throws BaseException
      */
     @Transactional
-    public PatchUsedTransactionRes updateUsedTransaction(Integer postingNo, Integer userNo, PatchUsedTransactionReq patchUsedReq) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public PatchUsedTransactionRes updateUsedTransaction(Integer postingNo, PatchUsedTransactionReq patchUsedReq) throws BaseException {
         // 존재하는 포스팅, 사진 확인
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         if(sellPostingInfo.getStatus().equals("Y")) {
@@ -106,7 +96,7 @@ public class UsedTransactionService {
         }
 
         // 글 포스팅 작성자와 현재 로그인한 사람이 일치해야 함
-        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(userNo)) {
+        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(jwtService.getUserNo())) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
@@ -139,19 +129,15 @@ public class UsedTransactionService {
     }
 
     /**
-     * 중고거래 글 수정
-     * @param postingNo, userNo, buyerNo
+     * 중고거래 글 판매완료 처리
+     * @param postingNo, buyerNo
      * @throws BaseException
      */
     @Transactional
-    public void patchUsedTransactionSalesCompleted(Integer postingNo, Integer userNo, Integer buyerNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public void patchUsedTransactionSalesCompleted(Integer postingNo, Integer buyerNo) throws BaseException {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(buyerNo);
-        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(userNo)) {
+        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(jwtService.getUserNo())) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
         if (sellPostingInfo.getStatus().equals("Y")) {
@@ -178,23 +164,18 @@ public class UsedTransactionService {
 
     /**
      * 중고거래 글 삭제
-     * @param postingNo, userNo
+     * @param postingNo
      * @throws BaseException
      */
     @Transactional
-    public void deleteUsedTransaction(Integer postingNo, Integer userNo) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public void deleteUsedTransaction(Integer postingNo) throws BaseException {
         // 존재하는 포스팅, 사진확인, 관심확인, 리뷰확인
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrieveConcernByPostingNo(sellPostingInfo);
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByPostingNo(sellPostingInfo);
 
         // 글 포스팅 작성자와 현재 로그인한 사람이 일치해야 함
-        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(userNo)) {
+        if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(jwtService.getUserNo())) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
@@ -231,32 +212,37 @@ public class UsedTransactionService {
     }
 
     /**
-     * 중고거래 관심 등록
-     * @param postingNo, userNo
+     * 중고거래 관심 등록, 삭제
+     * @param postingNo
      * @return PostConcernRes
      * @throws BaseException
      */
     @Transactional
-    public PostConcernRes createConcern(Integer postingNo, Integer userNo) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
-        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
+    public PostConcernRes concern(Integer postingNo) throws BaseException {
+        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(jwtService.getUserNo());
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         List<SellPostingConcernInfo> existsConcernInfo = usedTransactionProvider.retrieveConcernByConcernUserNoAndPostingNo(usersInfo, sellPostingInfo);
 
         if(sellPostingInfo.getStatus().equals("N")) {
             throw new BaseException(ALREADY_DELETE_POSTING);
         }
-        if(!existsConcernInfo.isEmpty()) {
-            throw new BaseException(DUPLICATED_CONCERN);
-        }
-        if(sellPostingInfo.getSellerUserNo().getUserNo() == userNo) {
+
+        if(sellPostingInfo.getSellerUserNo().getUserNo() == jwtService.getUserNo()) {
             throw new BaseException(DO_NOT_WRITER);
         }
 
+        // 관심 존재하면 삭제
+        if(!existsConcernInfo.isEmpty()) {
+            try {
+                for(SellPostingConcernInfo concern : existsConcernInfo) {
+                    postConcernsRepository.delete(concern);
+                }
+            } catch (Exception exception) {
+                throw new BaseException(FAILED_TO_DELETE_CONSERN);
+            }
+        }
+
+        // 관심 존재하지 않는다면 생성
         SellPostingConcernInfo sellPostingConcernInfo = new SellPostingConcernInfo(usersInfo, sellPostingInfo);
         try {
             postConcernsRepository.save(sellPostingConcernInfo);
@@ -267,45 +253,5 @@ public class UsedTransactionService {
 
         return new PostConcernRes(sellPostingConcernInfo.getPostingNo().getPostingNo(),
                 sellPostingConcernInfo.getConcernUserNo().getUserNo(), sellPostingConcernInfo.getConcernNo());
-    }
-
-    /**
-     * 중고거래 관심 삭제
-     * @param postingNo, userNo
-     * @throws BaseException
-     */
-    @Transactional
-    public void deleteConcern(Integer postingNo, Integer userNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
-        UserInfo usersInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
-        SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
-        List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrieveConcernByConcernUserNoAndPostingNo(usersInfo, sellPostingInfo);
-
-        if(sellPostingInfo.getStatus().equals("N")) {
-            throw new BaseException(ALREADY_DELETE_POSTING);
-        }
-        int cnt = 0;
-        if(sellPostingConcernInfoList.isEmpty()) {
-            throw new BaseException(ALREADY_DELETE_CONCERN);
-        }
-        for(SellPostingConcernInfo concern : sellPostingConcernInfoList) {
-            if(concern.getConcernUserNo().getUserNo().equals(userNo)) {
-                cnt++;
-            }
-        }
-        if(cnt == 0) {
-            throw new BaseException(ALREADY_DELETE_CONCERN);
-        }
-
-        try {
-            for(SellPostingConcernInfo concern : sellPostingConcernInfoList) {
-                postConcernsRepository.delete(concern);
-            }
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_CONSERN);
-        }
     }
 }
