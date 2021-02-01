@@ -5,8 +5,6 @@ import com.rp2.shine.config.BaseResponse;
 import com.rp2.shine.src.review.models.GetReviewRes;
 import com.rp2.shine.src.review.models.PostReviewReq;
 import com.rp2.shine.src.review.models.PostReviewRes;
-import com.rp2.shine.src.review.models.ReviewInfo;
-import com.rp2.shine.src.user.models.GetUsersRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,13 +64,7 @@ public class ReviewController {
         }
     }
 
-    /**
-     * 판매자 후기 등록 API
-     * [POST] /reviews/seller/:userNo/post/:postingNo
-     * @PathVariable userNo, postingNo
-     * @RequestBody PostReviewReq
-     * @return BaseResponse<PostReviewRes>
-     */
+/*
     @ResponseBody
     @PostMapping("/seller/{userNo}/post/{postingNo}")
     public BaseResponse<PostReviewRes> postSellerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo, @RequestBody(required = false) PostReviewReq parameters) {
@@ -92,12 +84,7 @@ public class ReviewController {
         }
     }
 
-     /** 구매자 후기 등록 API
-     * [POST] /reviews/buyer/:userNo/post/:postingNo
-     * @PathVariable userNo, postingNo
-     * @RequestBody PostReviewReq
-     * @return BaseResponse<PostReviewRes>
-     */
+
      @ResponseBody
      @PostMapping("/buyer/{userNo}/post/{postingNo}")
      public BaseResponse<PostReviewRes> postBuyerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo, @RequestBody(required = false) PostReviewReq parameters) {
@@ -117,12 +104,7 @@ public class ReviewController {
          }
      }
 
-    /**
-     * 판매자 후기 삭제 API
-     * [DELETE] /seller/:userNo/delete/:postingNo
-     * @PathVariable userNo, postingNo
-     * @return BaseResponse<Void>
-     */
+
     @DeleteMapping("/seller/{userNo}/delete/{postingNo}")
     public BaseResponse<Void> deleteSellerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo) {
         if (userNo == null || userNo <= 0) {
@@ -137,12 +119,7 @@ public class ReviewController {
         }
     }
 
-    /**
-     * 구매자 후기 삭제 API
-     * [DELETE] /buyer/:userNo/delete/:postingNo
-     * @PathVariable userNo, postingNo
-     * @return BaseResponse<Void>
-     */
+
     @DeleteMapping("/buyer/{userNo}/delete/{postingNo}")
     public BaseResponse<Void> deleteBuyerReview(@PathVariable Integer userNo, @PathVariable Integer postingNo) {
         if (userNo == null || userNo <= 0) {
@@ -155,5 +132,5 @@ public class ReviewController {
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
-    }
+    }*/
 }

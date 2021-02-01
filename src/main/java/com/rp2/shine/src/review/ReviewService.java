@@ -33,17 +33,13 @@ public class ReviewService {
      * @throws BaseException
      */
     @Transactional
-    public PostReviewRes createSellerReviewInfo(Integer userNo, Integer postingNo, PostReviewReq parameters) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public PostReviewRes createSellerReviewInfo(Integer postingNo, PostReviewReq parameters) throws BaseException {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         ReviewInfo reviewInfo = new ReviewInfo(parameters.getContent(), sellPostingInfo, "S", parameters.getFileName(),parameters.getFilePath());
         MannerScoreInfo mannerScoreInfo = new MannerScoreInfo(sellPostingInfo.getSellerUserNo(), parameters.getTakeManner());
 
         // 판매자와 로그인 일치여부 확인
-        if(!userNo.equals(sellPostingInfo.getSellerUserNo().getUserNo())) {
+        if(jwtService.getUserNo() != sellPostingInfo.getSellerUserNo().getUserNo()) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
@@ -77,17 +73,13 @@ public class ReviewService {
      * @throws BaseException
      */
     @Transactional
-    public PostReviewRes createBuyerReviewInfo(Integer userNo, Integer postingNo, PostReviewReq parameters) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public PostReviewRes createBuyerReviewInfo(Integer postingNo, PostReviewReq parameters) throws BaseException {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         ReviewInfo reviewInfo = new ReviewInfo(parameters.getContent(), sellPostingInfo, "B", parameters.getFileName(),parameters.getFilePath());
         MannerScoreInfo mannerScoreInfo = new MannerScoreInfo(sellPostingInfo.getSellerUserNo(), parameters.getTakeManner());
 
         // 구매자와 로그인 일치여부 확인
-        if(!userNo.equals(sellPostingInfo.getBuyerUserNo().getUserNo())) {
+        if(jwtService.getUserNo() != sellPostingInfo.getBuyerUserNo().getUserNo()) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
@@ -116,18 +108,13 @@ public class ReviewService {
 
     /**
      * 판매 후기 삭제
-     * @param userNo, postingNo
+     * @param postingNo
      * @throws BaseException
      */
     @Transactional
-    public void deleteSellerReview(Integer userNo, Integer postingNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public void deleteSellerReview(Integer postingNo) throws BaseException {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveSellerReviewByPostingNoAndDivisionS(sellPostingInfo);
-
 
         // 이미 삭제되었나 없는 후기
         if(reviewInfoList.isEmpty()) {
@@ -135,7 +122,7 @@ public class ReviewService {
         }
         
         // 판매자와 일치하지 않는 후기
-        if(sellPostingInfo.getSellerUserNo().getUserNo() != userNo) {
+        if(sellPostingInfo.getSellerUserNo().getUserNo() != jwtService.getUserNo()) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
@@ -150,18 +137,13 @@ public class ReviewService {
 
     /**
      * 판매 후기 삭제
-     * @param userNo, postingNo
+     * @param postingNo
      * @throws BaseException
      */
     @Transactional
-    public void deleteBuyerReview(Integer userNo, Integer postingNo) throws BaseException {
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
-
+    public void deleteBuyerReview(Integer postingNo) throws BaseException {
         SellPostingInfo sellPostingInfo = usedTransactionProvider.retrievePostingByPostingNo(postingNo);
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveBuyerReviewByPostingNoAndDivisionB(sellPostingInfo);
-
 
         // 이미 삭제되었나 없는 후기
         if(reviewInfoList.isEmpty()) {
@@ -169,7 +151,7 @@ public class ReviewService {
         }
 
         // 구매자와 일치하지 않는 후기
-        if(sellPostingInfo.getBuyerUserNo().getUserNo() != userNo) {
+        if(sellPostingInfo.getBuyerUserNo().getUserNo() != jwtService.getUserNo()) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
