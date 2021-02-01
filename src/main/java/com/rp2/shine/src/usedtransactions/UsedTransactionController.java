@@ -142,7 +142,7 @@ public class UsedTransactionController {
      * @return BaseResponse<PostConcernRes>
      */
     @ResponseBody
-    @PostMapping("/{postingNo}/concerns")
+    @PostMapping("/{postingNo}/concern")
     public BaseResponse<PostConcernRes> postConcern(@PathVariable Integer postingNo) {
         if(postingNo == null) {
             return new BaseResponse<>(EMPTY_POSTINGNO);
