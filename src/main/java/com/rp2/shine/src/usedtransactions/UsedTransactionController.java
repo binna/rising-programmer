@@ -150,7 +150,11 @@ public class UsedTransactionController {
 
         try {
             PostConcernRes postConcernRes = usedTransactionsService.concern(postingNo);
-            return new BaseResponse<>(SUCCESS_POST_CONCERN, postConcernRes);
+            if(postConcernRes != null) {
+                return new BaseResponse<>(SUCCESS_POST_CONCERN, postConcernRes);
+            } else {
+                return new BaseResponse<>(SUCCESS_DELETE_CONCERN);
+            }
         } catch (BaseException exception) {
             //exception.printStackTrace();    // 에러 이유 추척
             return new BaseResponse<>(exception.getStatus());
