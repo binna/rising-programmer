@@ -199,7 +199,7 @@ public class UsedTransactionController {
     @PostMapping("/{postingNo}/reviews/buyer")
     public BaseResponse<PostReviewRes> postBuyerReview(@PathVariable Integer postingNo, @RequestBody(required = false) PostReviewReq parameters) {
         if(parameters.getContent() == null || parameters.getContent().length() == 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
+            return new BaseResponse<>(EMPTY_CONTENT);
         }
         if (parameters.getTakeManner() == null) {
             return new BaseResponse<>(EMPTY_MANNERSCORE);
