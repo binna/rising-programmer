@@ -1,5 +1,9 @@
 package com.rp2.shine.src.user;
 
+import com.rp2.shine.src.review.ReviewService;
+import com.rp2.shine.src.usedtransactions.UsedTransactionProvider;
+import com.rp2.shine.src.usedtransactions.UsedTransactionService;
+import com.rp2.shine.src.usedtransactions.models.SellPostingInfo;
 import com.rp2.shine.src.user.models.UserInfo;
 import com.rp2.shine.utils.JwtService;
 import com.rp2.shine.config.BaseException;
@@ -9,13 +13,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.rp2.shine.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
 public class UserInfoService {
     private final UserInfoRepository userInfoRepository;
+    private final MannerScoreRepository mannerScoreRepository;
     private final UserInfoProvider userInfoProvider;
+    private final UsedTransactionService usedTransactionService;
+    private final UsedTransactionProvider usedTransactionProvider;
+    private final ReviewService reviewService;
     private final JwtService jwtService;
     private final ValidationRegex validationRegex;
 
@@ -107,24 +117,32 @@ public class UserInfoService {
 
     /**
      * 회원 탈퇴
-     * @param userNo, reason
+     * @param reason
      * @throws BaseException
      */
     @Transactional
-    public void deleteUserInfo(Integer userNo, String reason) throws BaseException {
-        // JWT 인증
-        if(jwtService.getUserNo() != userNo) {
-            throw new BaseException(INVALID_JWT);
-        }
+    public void deleteUserInfo(String reason) throws BaseException {
+        // 존재하는 UserInfo가 있는지 확인 후 저장
+        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(jwtService.getUserNo());
 
-        // 1. 존재하는 UserInfo가 있는지 확인 후 저장
-        UserInfo userInfo = userInfoProvider.retrieveUserInfoByUserNO(userNo);
-
-        // 2. 해당 UserInfo의 status를 N으로 설정
+        // 해당 UserInfo의 status를 N으로 설정
         userInfo.setStatus("N");
         userInfo.setWithdrawalReason(reason);
         
-        // TODO 연관된 데이터들도 전부 상태값 N으로 만들어주는 작업 필요
+        // 중고거래 글, 사진 삭제, 후기 삭제, 관심삭제
+        List<SellPostingInfo> existSellPostingList = usedTransactionProvider.retrievePostingBySellerUserNoAndStatuY(userInfo);
+        for(SellPostingInfo posting : existSellPostingList) {
+            usedTransactionService.deleteUsedTransaction(posting.getPostingNo());
+            reviewService.deleteSellerReview(posting.getPostingNo());
+            reviewService.deleteBuyerReview(posting.getPostingNo());
+            usedTransactionService.concern(posting.getPostingNo());
+        }
+
+        // 매너점수
+        List<MannerScoreInfo> mannerScoreInfoList = mannerScoreRepository.findByUserNo(userInfo);
+        for(MannerScoreInfo manner : mannerScoreInfoList) {
+            mannerScoreRepository.delete(manner);
+        }
 
         try {
             userInfoRepository.save(userInfo);
