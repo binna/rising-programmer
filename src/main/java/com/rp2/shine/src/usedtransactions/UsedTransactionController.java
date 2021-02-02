@@ -119,7 +119,7 @@ public class UsedTransactionController {
      * @return BaseResponse<Void>
      */
     @ResponseBody
-    @DeleteMapping("/{postingNo}/{userNo}")
+    @DeleteMapping("/{postingNo}")
     public BaseResponse<Void> deleteUsedTransaction(@PathVariable Integer postingNo) {
         if (postingNo == null) {
             return new BaseResponse<>(EMPTY_SELLERUSERNO);
