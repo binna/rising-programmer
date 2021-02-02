@@ -174,28 +174,29 @@ public class UsedTransactionService {
         List<SellPostingConcernInfo> sellPostingConcernInfoList = usedTransactionProvider.retrieveConcernByPostingNo(sellPostingInfo);
         List<ReviewInfo> reviewInfoList = reviewProvider.retrieveReviewByPostingNo(sellPostingInfo);
 
+        // 유효한 포스팅인지 확인하기
+        if(sellPostingInfo.getStatus().equals("N")) {
+            throw new BaseException(ALREADY_DELETE_POSTING);
+        }
+
         // 글 포스팅 작성자와 현재 로그인한 사람이 일치해야 함
         if(!sellPostingInfo.getSellerUserNo().getUserNo().equals(jwtService.getUserNo())) {
             throw new BaseException(DO_NOT_MATCH_USERNO);
         }
 
         // 유효한 포스팅, 사진 : status 전부 N으로 변경
-        if(sellPostingInfo.getStatus().equals("Y")) {
-            List<SellPostingPhotoInfo> sellPostingPhotoInfoList = sellPostingInfo.getSellPostingPhotoInfoList();
+        List<SellPostingPhotoInfo> sellPostingPhotoInfoList = sellPostingInfo.getSellPostingPhotoInfoList();
 
-            for (SellPostingPhotoInfo photo : sellPostingPhotoInfoList) {
-                photo.setStatus("N");
-            }
-            for (SellPostingConcernInfo concern : sellPostingConcernInfoList) {
-                concern.setStatus("N");
-            }
-            for (ReviewInfo review : reviewInfoList) {
-                review.setStatus("N");
-            }
-            sellPostingInfo.setStatus("N");
-        } else {    // 이미 삭제한 포스팅
-            throw new BaseException(ALREADY_DELETE_POSTING);
+        for (SellPostingPhotoInfo photo : sellPostingPhotoInfoList) {
+            photo.setStatus("N");
         }
+        for (SellPostingConcernInfo concern : sellPostingConcernInfoList) {
+            concern.setStatus("N");
+        }
+        for (ReviewInfo review : reviewInfoList) {
+            review.setStatus("N");
+        }
+        sellPostingInfo.setStatus("N");
 
         try {
             postingInfoRepository.save(sellPostingInfo);
