@@ -151,21 +151,18 @@ public class UserInfoController {
 
     /**
      * 회원 탈퇴 API
-     * [DELETE] /users/:userNo
-     * @PathVariable userNo
+     * [DELETE] /users
+     * @RequestParam reason
      * @return BaseResponse<Void>
      */
-    @DeleteMapping("/{userNo}")
-    public BaseResponse<Void> deleteUser(@PathVariable Integer userNo, @RequestParam(required = false) String reason) {
-        if (userNo == null || userNo <= 0) {
-            return new BaseResponse<>(EMPTY_USERNO);
-        }
+    @DeleteMapping("")
+    public BaseResponse<Void> deleteUser(@RequestParam(required = false) String reason) {
         if (reason == null || reason.isEmpty()) {
             return new BaseResponse<>(EMPTY_WITHDRAWAL_REASON);
         }
 
         try {
-            userInfoService.deleteUserInfo(userNo, reason);
+            userInfoService.deleteUserInfo(reason);
             return new BaseResponse<>(SUCCESS_DELETE_USER);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
