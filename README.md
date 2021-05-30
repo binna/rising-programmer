@@ -7,9 +7,9 @@
 * week6 Paging & Regex & Test
 * week7, week8 : 모의외주
 
-<br><hr><br>
+<br>
 
-# 이 Repository는 수업 진행하면서 만들었던 과제(당근마켓 REST API)
+## 수업 진행하면서 만들었던 과제(당근마켓 REST API)
 
 <br><hr><br>
 
