@@ -11,8 +11,8 @@
 
 1. 3주차 과제
     * 모바일 어플리케이션에 대한 ERD 설계 : aquerytool 이용, 모바일 어플리케이션은 당근마켓 선택!!
-    > [URL] https://aquerytool.com:443/aquerymain/index/?rurl=4ae9e826-fbe3-4e7c-a353-fbd64f54ce2a&
-    > [Password] uqw54d
+        > [URL] https://aquerytool.com:443/aquerymain/index/?rurl=4ae9e826-fbe3-4e7c-a353-fbd64f54ce2a&
+        > [Password] uqw54d
 
 <br><hr><br>
 
