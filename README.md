@@ -1,5 +1,5 @@
 # 라이징 프로그래머2(Server-Part, 2020.12.28 ~ 2021.04.03)
-week1 서버 개요<br>
+ week1 서버 개요<br>
 week2 Server & Client<br>
 week3 DB<br>
 week4 Backend-language & API<br>
