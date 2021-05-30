@@ -8,4 +8,8 @@ week6 Paging & Regex & Test<br>
 week7, week8 : 모의외주<br>
 
 
-당근마켓 REST API
+<br><hr><br>
+
+# 해당 수업을 들으면서 참여했던 팀프로젝트
+1. [모의외주](https://shine94.tistory.com/256?category=929803)
+2. [MakeUS](https://shine94.tistory.com/264?category=941564)
