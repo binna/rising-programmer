@@ -16,7 +16,8 @@
     * 엑셀 or 스프레드 시트에 자신이 표현하고자 했던 화면과 컬럼을 각각 캡쳐하고 작성
         > ![image](https://user-images.githubusercontent.com/7114874/120109195-5aac3f80-c1a3-11eb-88cf-bd087f099de2.png)
         > ![image](https://user-images.githubusercontent.com/7114874/120109227-77487780-c1a3-11eb-989f-2aaeb42f7752.png)
-        > ![image](https://user-images.githubusercontent.com/7114874/120109241-8d563800-c1a3-11eb-9550-accda6236640.png)
+        > ![image](https://user-images.githubusercontent.com/7114874/120109279-aced6080-c1a3-11eb-8d45-911e22befcd3.png)
+
 
 
 
