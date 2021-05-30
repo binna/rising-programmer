@@ -9,7 +9,7 @@
 
 <br><hr><br>
 
-# 수업 진행하면서 만들었던 당근마켓 REST API 과제
+# 당근마켓 REST API(라이징 프로그래머2 수업 과제)
 [당근마켓 REST API 시연영상 보러가기](https://shine94.tistory.com/253?category=918492)
 
 <br><hr><br>
